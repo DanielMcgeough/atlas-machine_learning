@@ -2,7 +2,7 @@
 """this defines the method that concatenates matrices"""
 
 
-def cat_matrices2d(mat1, mat2, axis=0):
+def cat_matrices2D(mat1, mat2, axis=0):
     """concates two matrices with an axis passed in"""
     if axis == 0:
         if len(mat1[0]) != len(mat2[0]):
