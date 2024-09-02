@@ -10,7 +10,7 @@ def change_scale():
     plt.figure(figsize=(6.4, 4.8))
 
     plt.plot(x, y)
-    plt.xlim(0, 28651)
+    plt.xlim(0, 28650)
     plt.yscale('log')
     plt.xlabel('Time (years)')
     plt.ylabel('Franction Remaining')
