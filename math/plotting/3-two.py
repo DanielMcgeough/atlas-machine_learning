@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Two is sometimes better than one"""
+""" two file for task 3 """
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def two():
-    """two function that makes a graph of dangerous elements"""
+    """ two function makes a graph. """
+
     x = np.arange(0, 21000, 1000)
     r = np.log(0.5)
     t1 = 5730
@@ -14,11 +16,10 @@ def two():
     plt.figure(figsize=(6.4, 4.8))
 
     plt.plot(x, y1, 'r--', label='C-14')
-    plt.plot(x, y2, 'g-', label='Ra-266')
+    plt.plot(x, y2, 'g-', label='Ra-226')
     plt.xlabel('Time (years)')
     plt.ylabel('Fraction Remaining')
     plt.title('Exponential Decay of Radioactive Elements')
-    plt.yscale('log')
     plt.xlim(0, 20000)
     plt.ylim(0, 1)
     plt.legend(loc='upper right')
