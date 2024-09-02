@@ -9,5 +9,6 @@ def line():
     x = np.arrange(0, 11)
     y = np.arange(0, 11) ** 3
     plt.figure(figsize=(6.4, 4.8))
-    plt.plot(x, y, 'r-')
-    
+    plt.plot(x, y, color='red', linestyle='-')
+    plt.xlim(0, 10)
+    plt.show()
