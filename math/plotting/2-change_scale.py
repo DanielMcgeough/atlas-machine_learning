@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+"""module to change the scale of the plot"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def change_scale():
+    """doc for change scale func"""
     x = np.arange(0, 28651, 5730)
     r = np.log(0.5)
     t = 5730
