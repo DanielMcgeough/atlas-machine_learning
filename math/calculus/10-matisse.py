@@ -19,7 +19,8 @@ def poly_derivative(poly):
         """this is to skip 0 if its the constant term since the derivative
         of a constant or the rate of change is always 0"""
         derivative.append(i * coeff)
-        """ for all other index values the coeff is multiplied and appened to the list
+        """ for all other index values the coeff
+        is multiplied and appened to the list
         this is based on the power rule for differentiation"""
     if not derivative or all(coeff == 0 for coeff in derivative):
         """This part just checks for 0"""
