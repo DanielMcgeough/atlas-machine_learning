@@ -1,32 +1,22 @@
 #!/usr/bin/env python3
-"""Module defines the poly_derivative method"""
+"""Module defines the poly_integral method"""
 
 
 def poly_integral(poly, C=0):
-    """
-    Calculates the integral of a polynomial represented as a list of coefficients.
-
-    Args:
-        poly: A list of coefficients representing the polynomial.
-        C: An integer representing the integration constant.
-
-    Returns:
-        A list of coefficients representing the integral of the polynomial, or None if the input is invalid.
-    """
-
-    if not isinstance(poly, list) or len(poly) == 0:
+    """Calculates the integral of a polynomial"""
+    if not isinstance(poly, list) or not isinstance(C, (int, float)):
         return None
-
-    if not isinstance(C, int):
+    if not poly:
         return None
-
     integral = [C]
     for i, coeff in enumerate(poly):
-        if i == 0:
-            continue
-        new_coeff = coeff / (i + 1)
-        if new_coeff.is_integer():
-            new_coeff = int(new_coeff)
-        integral.append(new_coeff)
-
+        if coeff % (i + 1) == 0:
+            # use integer division to avoid float imprecision
+            integral.append(coeff // (i + 1))
+        else:
+            # use regular division for fractional coefficient
+            integral.append(coeff / (i + 1))
+    # remove trailing zeros
+    if integral[-1] == 0:
+        integral.pop()
     return integral
