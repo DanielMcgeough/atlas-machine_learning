@@ -45,3 +45,17 @@ class Poisson:
         return (e_lambda * lambda_k) / k_factorial
         """base of natural logarithm multiplied by
         the average rate of events equals k factorial"""
+
+    def cdf(self, k):
+        """Calculate the value of the cdf or the
+        number of 'successes' or occurence of a
+        certain outcome."""
+        k = int(k)
+        if k < 0:
+            return 0
+
+        cdf_value = 0
+        for i in range(k + 1):
+            cdf_value += self.pmf(i)
+
+        return cdf_value
