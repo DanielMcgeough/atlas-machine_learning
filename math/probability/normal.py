@@ -8,7 +8,7 @@ class Normal:
     def __init__(self, data=None, mean=0., stddev=1.):
         """
         Initialize Normal distribution.
-        Normal Distribution- Also known as the Gaussian 
+        Normal Distribution- Also known as the Gaussian
         distribution or bell curve, the normal distribution
         is a continuous probability distribution that is
         widely used to model real-world data. It's characterized
