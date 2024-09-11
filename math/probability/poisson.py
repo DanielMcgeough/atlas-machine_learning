@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """Poisson functions
     Poisson-
-    A Poisson distribution is a probability distribution that describes the number of times an event occurs in a fixed interval of time
-    or space. It's often used to model random events that happen independently at a constant average rate. The key parameters of a Poisson 
-    distribution are the average rate of events (lambda) and the time or space interval being considered.
+    A Poisson distribution is a probability distribution
+    that describes the number of times an event occurs
+    in a fixed interval of time or space. It's often used
+    to model random events that happen independently at
+    a constant average rate. The key parameters of a Poisson
+    distribution are the average rate of events (lambda)
+    and the time or space interval being considered.
 """
 
 
