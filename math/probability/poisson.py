@@ -41,7 +41,7 @@ class Poisson:
         k_factorial = 1
         for i in range(1, k + 1):
             k_factorial *= i
-        
+
         return (e_lambda * lambda_k) / k_factorial
         """base of natural logarithm multiplied by
         the average rate of events equals k factorial"""
