@@ -62,16 +62,7 @@ class Normal:
         """
         z = self.z_score(x)
         z = (x - self.mean) / (self.stddev * (2 ** 0.5))
-
-        # Use numerical integration (Simpson's rule) to approximate the CDF
-        num_steps = 1000
-        step_size = z / num_steps
-        integral = 0
-
-        for i in range(num_steps):
-            x0 = i * step_size
-            x1 = (i + 1) * step_size
-            integral += (self.pdf(x0) + 4 * self.pdf((x0 + x1) / 2) +
-                         self.pdf(x1)) * step_size / 6
-
-        return 0.5 + integral
+        pi = 3.1415926536
+        erf = 2 / (pi ** 0.5) * (z - (z ** 3) / 3 + (z ** 5) / 10 -
+                                 (z ** 7) / 42 + (z ** 9) / 216)
+        return 0.5 * (1 + erf)
