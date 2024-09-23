@@ -15,10 +15,10 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
 
-        self.L = len(layers)
+        self.__L = len(layers)
 
-        self.cache = {}
-        self.weights = {}
+        self.__cache = {}
+        self.__weights = {}
 
         for i in range(1, self.L + 1):
             if not isinstance(layers[i-1], int) or layers[i-1] <= 0:
@@ -37,15 +37,12 @@ class DeepNeuralNetwork:
 
     @property
     def L(self):
-        """Getter for L"""
         return self.__L
 
     @property
     def cache(self):
-        """Getter for cache"""
         return self.__cache
 
     @property
     def weights(self):
-        """Getter for weights"""
         return self.__weights
