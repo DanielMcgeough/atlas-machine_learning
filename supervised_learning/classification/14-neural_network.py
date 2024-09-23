@@ -4,9 +4,9 @@ import numpy as np
 
 
 class NeuralNetwork:
-    """class for NeuralNetwork"""
+    """class for NeuralNetworks"""
     def __init__(self, nx, nodes):
-        """constructor for NeuralNetwork"""
+        """initializes NeuralNetwork"""
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
@@ -48,7 +48,7 @@ class NeuralNetwork:
         return self.__A2
 
     def forward_prop(self, X):
-        """method for forward propagation"""
+        """method for forward propagation through network"""
         Z1 = np.dot(self.__W1, X) + self.__b1
         self.__A1 = 1 / (1 + np.exp(-Z1))
         Z2 = np.dot(self.__W2, self.__A1) + self.__b2
@@ -64,14 +64,14 @@ class NeuralNetwork:
         return cost
 
     def evaluate(self, X, Y):
-        """defines a neutal network with one hidden layer"""
+        """defines a neutal network with a hidden layer"""
         self.forward_prop(X)
         cost = self.cost(Y, self.__A2)
         prediction = np.where(self.__A2 >= 0.5, 1, 0)
         return prediction, cost
 
     def gradient_descent(self, X, Y, A1, A2, alpha=0.05):
-        """defines a neural network with one hidden layer """
+        """defines a neural network with a hidden layer """
         m = X.shape[1]
 
         dZ2 = A2 - Y
@@ -88,7 +88,7 @@ class NeuralNetwork:
         self.__b1 -= alpha * db1
 
     def train(self, X, Y, iterations=5000, alpha=0.05):
-        """trains the neural network"""
+        """trains the neural network to be more accurate"""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -101,4 +101,5 @@ class NeuralNetwork:
         for i in range(iterations):
             self.forward_prop(X)
             self.gradient_descent(X, Y, self:"lk".__A1, self.__A2, alpha)
+
         return self.evaluate(X, Y)
