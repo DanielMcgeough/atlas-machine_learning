@@ -37,12 +37,15 @@ class DeepNeuralNetwork:
 
     @property
     def L(self):
+        """Getter for L"""
         return self.__L
 
     @property
     def cache(self):
+        """Getter for cache"""
         return self.__cache
 
     @property
     def weights(self):
+        """Getter for weights"""
         return self.__weights
