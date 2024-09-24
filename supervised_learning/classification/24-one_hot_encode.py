@@ -10,7 +10,7 @@ def one_hot_encode(Y, classes):
     while all others are 0. It's a common
     representation for categorical data,
     where each unique category is assigned
-    a corresponding column in the matrix."""    
+    a corresponding column in the matrix."""
     if not isinstance(Y, np.ndarray) or len(Y.shape) < 1:
         return None
     if not isinstance(classes, int) or classes < 1:
