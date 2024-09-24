@@ -1,172 +1,101 @@
-#!/usr/bin/env python3
-"""Module for DeepNeuralNetwork"""
 import numpy as np
-import matplotlib.pyplot as plt
-import pickle
-
 
 class DeepNeuralNetwork:
-    """class for DeepNeuralNetwork"""
-
     def __init__(self, nx, layers, activation='sig'):
-        """initializes class for dnn"""
-        if not isinstance(nx, int):
-            raise TypeError("nx must be an integer")
-        if nx < 1:
-            raise ValueError("nx must be a positive integer")
-        if not isinstance(layers, list) or not layers:
-            raise TypeError("layers must be a list of positive integers")
+        """
+        Initializes a deep neural network.
 
-        self.__L = len(layers)
+        Args:
+            nx: The number of input features.
+            layers: A list containing the number of neurons in each layer.
+            activation: The type of activation function to use (default: 'sig').
+                Must be 'sig' or 'tanh'.
+        """
 
-        self.__cache = {}
+        # Check for valid activation function
+        if activation not in ('sig', 'tanh'):
+            raise ValueError("activation must be 'sig' or 'tanh'")
+
+        self.__layers = layers
         self.__weights = {}
+        self.__biases = {}
         self.__activation = activation
 
-        for i in range(self.__L):
-            if not isinstance(layers[i-1], int) or layers[i-1] <= 0:
-                raise TypeError("layers must be a list of positive integers")
+        # Initialize weights and biases
+        for i in range(1, len(layers)):
+            prev_layer = layers[i - 1]
+            current_layer = layers[i]
+            self.__weights[f"W{i}"] = np.random.randn(current_layer, prev_layer) * np.sqrt(2 / prev_layer)
+            self.__biases[f"b{i}"] = np.zeros((current_layer, 1))
 
-            layer_size = layers[i - 1]
-
-            prev_layer_size = nx if i == 1 else layers[i - 2]
-
-            self.weights['W' + str(i)] = (
-                np.random.randn(layer_size, prev_layer_size) *
-                np.sqrt(2 / prev_layer_size)
-            )
-
-            self.weights['b' + str(i)] = np.zeros((layer_size, 1))
-
-    @property
-    def L(self):
-        return self.__L
-
-    @property
-    def cache(self):
-        return self.__cache
-
-    @property
-    def weights(self):
-        return self.__weights
-    
     @property
     def activation(self):
+        """
+        Getter for the activation function.
+        """
         return self.__activation
 
-    def forward_prop(self, X):
-        """Calculates forward propagation of the neural network"""
-        self.__cache['A0'] = X
+    def forward_propagation(self, X):
+        """
+        Performs forward propagation through the network.
 
-        for i in range(1, self.__L + 1):
-            W = self.weights['W' + str(i)]
-            b = self.weights['b' + str(i)]
-            A_prev = self.__cache['A' + str(i - 1)]
+        Args:
+            X: The input data (numpy.ndarray).
 
-            z = np.dot(W, A_prev) + b
+        Returns:
+            A list containing the activations of each layer.
+        """
 
-            if i == self.__L:
-                t = np.exp(z - np.max(z, axis=0, keepdims=True))
-                A = t / np.sum(t, axis=0, keepdims=True)
+        A = X
+        activations = [A]
+
+        for i in range(1, len(self.__layers)):
+            W = self.__weights[f"W{i}"]
+            b = self.__biases[f"b{i}"]
+            Z = np.dot(W, A) + b
+
+            # Apply activation function based on self.__activation
+            if self.__activation == 'sig':
+                A = 1 / (1 + np.exp(-Z))
+            elif self.__activation == 'tanh':
+                A = np.tanh(Z)
             else:
-                if self.__activation == 'sig':
-                    A = 1 / (1 + np.exp(-z))
+                raise ValueError("Unexpected activation function")
 
-            self.__cache['A' + str(i)] = A
+            activations.append(A)
 
-        return A, self.__cache
-
-    def cost(self, Y, A):
-        """calculates the cost of the model using logical regression"""
-        m = Y.shape[1]
-        cost = -1 / m * np.sum(Y * np.log(A + 1e-8))
-        return cost
-
-    def evaluate(self, X, Y):
-        """Evaluates the neural network's predictions"""
-        A, _ = self.forward_prop(X)
-        cost = self.cost(Y, A)
-        predictions = np.argmax(A, axis=0)
-        one_hot_predictions = np.eye(Y.shape[0])[predictions].T
-        return one_hot_predictions, cost
+        return activations
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """Calculates gradient descent on one pass of neural network"""
-        m = Y.shape[1]
-        dZ = cache[f"A{self.__L}"] - Y
+        """
+        Performs one pass of gradient descent on the network.
 
-        for i in range(self.__L, 0, -1):
-            A_prev = cache[f'A{i-1}']
+        Args:
+            Y: The correct labels (numpy.ndarray).
+            cache: A dictionary containing the activations from forward prop.
+            alpha: The learning rate.
+        """
 
-            dW = (1 / m) * np.matmul(dZ, A_prev.T)
-            db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+        m = Y.shape[1]  # Number of examples
+        L = len(self.__layers) - 1  # Number of hidden layers
 
-            if i > 1:
-                dA_prev = np.matmul(self.__weights[f'W{i}'].T, dZ)
-                if self.__activation == 'sig':
-                    dZ = dA_prev * A_prev * (1 - A_prev)
-                else:
-                    dZ = dA_prev * (1 - A_prev ** 2)
+        # Backpropagate through the network
+        dA = -(Y - cache["A" + str(L)])
 
-            self.__weights[f'W{i}'] -= alpha * dW
-            self.__weights[f'b{i}'] -= alpha * db
+        for i in range(L, 0, -1):
+            if self.__activation == 'sig':
+                dZ = dA * cache["A" + str(i)] * (1 - cache["A" + str(i)])
+            elif self.__activation == 'tanh':
+                dZ = dA * (1 - np.power(cache["A" + str(i)], 2))
+            else:
+                raise ValueError("Unexpected activation function")
 
-    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
-              graph=True, step=100):
-        """Trains the deep neural network"""
-        if not isinstance(iterations, int):
-            raise TypeError("iterations must be an integer")
-        if iterations <= 0:
-            raise ValueError("iterations must be a positive integer")
-        if not isinstance(alpha, float):
-            raise TypeError("alpha must be a float")
-        if alpha <= 0:
-            raise ValueError("alpha must be a positive float")
-        if verbose or graph:
-            if not isinstance(step, int):
-                raise TypeError("step must be an integer")
-            if step <= 0 or step > iterations:
-                raise ValueError("step must be a positive integer " +
-                                 "less than or equal to iterations")
+            dW = np.dot(dZ, cache["A" + str(i - 1)].T) / m
+            db = np.sum(dZ, axis=1, keepdims=True) / m
 
-        graph_matrix = [[], []]
-        for i in range(iterations + 1):
-            A, self.__cache = self.forward_prop(X)
-            self.gradient_descent(Y, self.__cache, alpha)
+            # Update weights and biases
+            self.__weights[f"W{i}"] -= alpha * dW
+            self.__biases[f"b{i}"] -= alpha * db
 
-            if i % step == 0 or i == iterations:
-                if verbose:
-                    print(f"Cost after {i} iterations: {self.cost(Y, A)}")
-                if graph:
-                    graph_matrix[0].append(i)
-                    graph_matrix[1].append(self.cost(Y, A))
-
-        if graph:
-            plt.plot(graph_matrix[0], graph_matrix[1])
-            plt.xlabel('iteration')
-            plt.ylabel('cost')
-            plt.title('Training Cost')
-            plt.show()
-
-        return self.evaluate(X, Y)
-
-    def save(self, filename):
-        """Saves the instance object to a file"""
-        if not filename.endswith('.pkl'):
-            filename += '.pkl'
-
-        with open(filename, 'wb') as file:
-            pickle.dump(self, file)
-
-    @staticmethod
-    def load(filename):
-        """Loads a pickled DeepNeuralNetwork object"""
-
-        if not filename.endswith('.pkl'):
-            filename += '.pkl'
-
-        try:
-            with open(filename, 'rb') as file:
-                return pickle.load(file)
-        except FileNotFoundError:
-            return None
+            # Update dA for the next iteration
+            dA = np.dot(self.__weights[f"W{i}"].T, dZ)
