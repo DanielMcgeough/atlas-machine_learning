@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Module for my first Deep Neural Network"""
+import numpy as np
+
+
+class DeepNeuralNetwork:
+    """establishes class for DeepNeuralNetwork"""
+
+    def __init__(self, nx, layers):
+        """Initialises deep neural network"""
+        if not isinstance(nx, int):
+            raise TypeError("nx must be an integer")
+        if nx < 1:
+            raise ValueError("nx must be a positive integer")
+        if not isinstance(layers, list) or not layers:
+            raise TypeError("layers must be a list of positive integers")
+
+        self.__L = len(layers)
+
+        self.__cache = {}
+        self.__weights = {}
+
+        for i in range(1, self.L + 1):
+            if not isinstance(layers[i-1], int) or layers[i-1] <= 0:
+                raise TypeError("layers must be a list of positive integers")
+
+            layer_size = layers[i - 1]
+
+            prev_layer_size = nx if i == 1 else layers[i - 2]
+
+            self.weights['W' + str(i)] = (
+                np.random.randn(layer_size, prev_layer_size) *
+                np.sqrt(2 / prev_layer_size)
+            )
+
+            self.weights['b' + str(i)] = np.zeros((layer_size, 1))
+
+    @property
+    def L(self):
+        return self.__L
+
+    @property
+    def cache(self):
+        return self.__cache
+
+    @property
+    def weights(self):
+        return self.__weights
+
+    def forward_prop(self, X):
+        """Calculate forward propagation of a deep neural network"""
+        self.__cache['A0'] = X
+
+        for i in range(1, self.__L + 1):
+            W = self.weights['W' + str(i)]
+            b = self.weights['b' + str(i)]
+            A_prev = self.__cache['A' + str(i - 1)]
+
+            z = np.dot(W, A_prev) + b
+            A = 1 / (1 + np.exp(-z))
+
+            self.__cache[f'A{i}'] = A
+
+        return A, self.__cache
+
+    def cost(self, Y, A):
+        """Calculate the cost of model using logical regression"""
+        m = Y.shape[1]
+        cost = -1 / m * np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
+        return cost
+
+    def evaluate(self, X, Y):
+        """Evaluates the neural networks prediction"""
+        A, _ = self.forward_prop(X)
+        cost = self.cost(Y, A)
+        prediction = np.where(A >= 0.5, 1, 0)
+        return prediction, cost
+
+    def gradient_descent(self, Y, cache, alpha=0.05):
+        """Calculates on pass of gradient descent
+        on the deep neural network. not my own words
+        though... sad face"""
+        m = Y.shape[1]
+        dZ = cache[f'A{i-1}'] 
+        """Calculate the derivative
+        of the cost with respect to the output"""
+        for i in range(self.__L, 0, -1):
+            A_prev = cache[f'A{i-1}']
+
+            dW = (1 / m) * np.dot(dZ, A_prev.T)
+            db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+
+            dA_prev = np.dot(self.__weights[f'W{i}'].T, dZ)
+            dZ = dA_prev * A_prev * (1 - A_prev)
+
+            self.__weights[f'W{i}'] -= alpha * dW
+            self.__weights[f'b{i}'] -= alpha * db
