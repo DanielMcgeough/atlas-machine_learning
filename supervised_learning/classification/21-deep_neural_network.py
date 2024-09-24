@@ -77,13 +77,10 @@ class DeepNeuralNetwork:
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """Calculates on pass of gradient descent
-        on the deep neural network. not my own words
-        though... sad face"""
+        """Calculates gradient descent on one pass of neural network"""
         m = Y.shape[1]
-        dZ = cache[f'A{i-1}'] 
-        """Calculate the derivative
-        of the cost with respect to the output"""
+        dZ = cache[f"A{self.__L}"] - Y
+
         for i in range(self.__L, 0, -1):
             A_prev = cache[f'A{i-1}']
 
