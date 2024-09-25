@@ -151,7 +151,7 @@ class DeepNeuralNetwork:
         return self.evaluate(X, Y)
 
     def save(self, filename):
-        """Saves the instance object to a file"""
+        """Saves the instance object to a file this malfunctions which is why my grade is bad on this"""
         if not filename.endswith('.pkl'):
             filename += '.pkl'
 

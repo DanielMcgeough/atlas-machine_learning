@@ -143,7 +143,7 @@ class DeepNeuralNetwork:
         return self.evaluate(X, Y)
 
     def save(self, filename):
-        """Saves the instance object to a file in bytestream"""
+        """Saves the instance object to a file in bytestream Although this part is broken"""
         if not filename.endswith('.pkl'):
             filename += '.pkl'
 
