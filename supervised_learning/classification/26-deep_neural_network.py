@@ -137,7 +137,7 @@ class DeepNeuralNetwork:
     def save(self, filename):
         """Saves the instance object to a file.
         Its in byte stream and is called
-        pickling."""
+        pickling. Tried so hard to find what the issue is, I just don't know."""
         if not filename.endswith('.pkl'):
             filename += '.pkl'
         with open(filename, 'wb') as file:
