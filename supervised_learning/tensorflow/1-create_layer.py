@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""for tensorflow without Keras"""
+"""for tensorflow without Keras... explicitly"""
 import tensorflow.compat.v1 as tf
 
 
