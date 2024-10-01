@@ -7,7 +7,7 @@ def create_layer(prev, n, activation):
     """function to create layers in neural network"""
     v = tf.keras.initializers.VarianceScaling(mode='fan_avg')
 
-    layer = tf.keras.Dense(
+    layer = tf.keras.layers.Dense(
         units=n,
         activation=activation,
         kernel_initializer=v,
