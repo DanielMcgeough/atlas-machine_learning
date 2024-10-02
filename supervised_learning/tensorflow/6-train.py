@@ -48,7 +48,14 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
     for i in range(iterations):
       _, train_cost, train_acc = sess.run([train_op, loss, accuracy], feed_dict={x: X_train, y: Y_train})
 
-      # ... (rest of your training loop here)
+      # Print training progress (optional)
+    if i % 100 == 0:  # Print every 100th iteration
+        print(f"Iteration: {i}, Training Cost: {train_cost:.4f}, Training Accuracy: {train_acc:.4f}")
+
+    # Evaluate the model on validation set (optional)
+    if i % 500 == 0:  # Evaluate every 500th iteration
+        validation_loss, validation_accuracy = evaluate(X_valid, Y_valid, save_path)
+        print(f"Validation Loss: {validation_loss:.4f}, Validation Accuracy: {validation_accuracy:.4f}")
 
   saver.save(sess, save_path)
 
