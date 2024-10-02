@@ -1,4 +1,6 @@
-import tensorflow as tf
+#!/usr/bin/env python3
+"""for tensorflow without Keras... explicitly"""
+import tensorflow.compat.v1 as tf
 
 def evaluate(X, Y, save_path):
   """Evaluates the output of a neural network.
