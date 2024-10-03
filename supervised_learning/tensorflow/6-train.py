@@ -16,7 +16,7 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
   """
 
   """Create placeholders for input data and labels"""
-  x, y = create_placeholders(layer_sizes[0], layer_sizes[-1])
+  x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
 
   """Forward propagation"""
   y_pred = forward_prop(x, layer_sizes, activations)
@@ -30,33 +30,43 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
 
   """Add placeholders, tensors, and operation
   to the graph's collection"""
-  tf.add_to_collection('placeholders', x)
-  tf.add_to_collection('placeholders', y)
-  tf.add_to_collection('tensors', y_pred)
-  tf.add_to_collection('tensors', loss)
-  tf.add_to_collection('tensors', accuracy)
-  tf.add_to_collection('operations', train_op)
+  tf.add_to_collection('x', x)
+  tf.add_to_collection('y', y)
+  tf.add_to_collection('y_pred', y_pred)
+  tf.add_to_collection('loss', loss)
+  tf.add_to_collection('accuracy', accuracy)
+  tf.add_to_collection('train_op', train_op)
 
   """Create a saver"""
+  init = tf.global_variables_initializer()
   saver = tf.train.Saver()
 
-  with tf.Session() as sess:
+  with tf.Session() as sess
     """initialize variables"""
-    sess.run(tf.global_variables_initializer())
+    sess.run(init)
 
     """Train the model with a for loop"""
-    for i in range(iterations):
-      _, train_cost, train_acc = sess.run([train_op, loss, accuracy], feed_dict={x: X_train, y: Y_train})
+    for i in range(iterations + 1):
+        # Calculate training cost and accuracy
+        t_cost, t_accuracy = sess.run([loss, accuracy],
+        feed_dict={x: X_train, y: y_train})
 
-      # Print training progress (optional)
-    if i % 100 == 0:  # Print every 100th iteration
-        print(f"Iteration: {i}, Training Cost: {train_cost:.4f}, Training Accuracy: {train_acc:.4f}")
+        # Calculate validation cost and accuracy
+        v_cost, v_accuracy = sess.run([loss, accuracy],
+        feed_dict={x: X_valid, y: y_valid})
 
-    # Evaluate the model on validation set (optional)
-    if i % 500 == 0:  # Evaluate every 500th iteration
-        validation_loss, validation_accuracy = evaluate(X_valid, Y_valid, save_path)
-        print(f"Validation Loss: {validation_loss:.4f}, Validation Accuracy: {validation_accuracy:.4f}")
+        # Print progress at specified intervals
+        if i % 100 == 0 or i == iterations:
+            print(f"After {i} iterations:")
+            print(f"\tTraining Cost: {t_cost}")
+            print(f"\tTraining Accuracy: {t_accuracy}")
+            print(f"\tValidation Cost: {v_cost}")
+            print(f"\tValidation Accuracy: {v_accuracy}")
 
-  saver.save(sess, save_path)
+            # Perform training step if not at the last iteration
+        if i < iterations:
+            sess.run(train_op, feed_dict={x: X_train, y: y_train})
 
+        # Save the model and return the save path
+        return saver.save(sess, save_path)
   return save_path
