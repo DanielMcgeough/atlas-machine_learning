@@ -11,7 +11,7 @@ def moving_average(data, beta):
         beta: The weight used for the moving average.
 
     Returns:
-        A list containing the moving averages of data.   
+        A list containing the moving averages of data.
 
     """
 
