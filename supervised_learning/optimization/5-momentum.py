@@ -4,7 +4,9 @@ import numpy as np
 
 
 def update_variables_momentum(alpha, beta1, var, grad, v):
-    """Updates a variable using the gradient descent with momentum optimization algorithm.   
+    """Updates a variable using the gradient
+    descent with momentum optimization
+    algorithm.
 
 
     Args:
