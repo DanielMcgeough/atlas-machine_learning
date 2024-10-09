@@ -10,7 +10,7 @@ def create_Adam_op(alpha, beta1, beta2, epsilon):
         alpha: The learning rate.
         beta1: The weight used for the first moment.
         beta2: The weight used for the second moment.
-        epsilon: A small number to avoid division by   
+        epsilon: A small number to avoid division by
         zero.
 
     Returns:
