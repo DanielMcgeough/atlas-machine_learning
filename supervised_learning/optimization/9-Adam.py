@@ -4,7 +4,7 @@ import numpy as np
 
 
 def update_variables_Adam(alpha, beta1, beta2, epsilon, var, grad, v, s, t):
-    """Updates a variable in place using the Adam optimization algorithm.   
+    """Updates a variable in place using the Adam optimization algorithm.
 
 
     Args:
@@ -20,7 +20,8 @@ def update_variables_Adam(alpha, beta1, beta2, epsilon, var, grad, v, s, t):
         t: The time step used for bias correction.
 
     Returns:
-        The updated variable, the new first moment, and the new second moment, respectively.   
+        The updated variable, the new first moment,
+        and the new second moment, respectively.
 
     """
 
