@@ -15,14 +15,9 @@ def moving_average(data, beta):
 
     """
 
-    # Initialize the moving average
-    ma = [data[0]]
-
-    # Calculate the moving average for the rest of the data points
-    for i in range(1, len(data)):
-        ma.append(beta * ma[-1] + (1 - beta) * data[i])
-
-    # Apply bias correction
-    ma = [ma[0]] + [ma[i] / (1 - beta**i) for i in range(1, len(ma))]
-
+    weighted_average = 0
+    ma = []
+    for i, x in enumerate(data, 1):
+        weighted_average = beta * weighted_average + (1 - beta) * x
+        ma.append(weighted_average / (1 - beta**i))
     return ma
