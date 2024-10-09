@@ -22,7 +22,7 @@ def normalize(X, m, s):
   """
 
     # Normalize each feature by subtracting
-    # the mean and dividing by the standard 
+    # the mean and dividing by the standard
     # deviation
     X_normalized = (X - m) / s
 
