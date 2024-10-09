@@ -1,4 +1,4 @@
-#!/bin/user/env python3
+#!/usr/bin/env python3
 """This is needed to pass checker"""
 import numpy as np
 
