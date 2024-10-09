@@ -7,7 +7,7 @@ def normalization_constants(X):
     """Calculates the normalization (standardization) constants of a matrix.
 
     Args:
-        X: A numpy.ndarray of shape (m, nx) to normalize.   
+        X: A numpy.ndarray of shape (m, nx) to normalize.
 
         m: The number of data points.
         nx: The number of features.
