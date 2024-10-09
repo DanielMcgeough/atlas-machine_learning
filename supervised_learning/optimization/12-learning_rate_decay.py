@@ -21,16 +21,9 @@ def learning_rate_decay(alpha, decay_rate, decay_step):
     # Create a global step variable to track the number of training steps
     global_step = tf.Variable(0, trainable=False)
 
-    # Create the learning rate decay schedule
-    learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
+    return tf.keras.optimizers.schedules.InverseTimeDecay(
         initial_learning_rate=alpha,
         decay_steps=decay_step,
         decay_rate=decay_rate,
         staircase=True
     )
-
-    # Create the learning rate decay operation
-    learning_rate_decay_op = tf.assign_add(global_step, 1)
-    learning_rate_op = tf.assign(alpha, learning_rate(global_step))
-
-    return learning_rate_op
