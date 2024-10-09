@@ -16,8 +16,8 @@ def moving_average(data, beta):
     """
 
     weighted_average = 0
-    ma = []
+    moving_average = []
     for i, x in enumerate(data, 1):
         weighted_average = beta * weighted_average + (1 - beta) * x
-        ma.append(weighted_average / (1 - beta**i))
-    return ma
+        moving_average.append(weighted_average / (1 - beta**i))
+    return moving_average
