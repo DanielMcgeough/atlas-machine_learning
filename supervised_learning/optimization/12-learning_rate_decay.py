@@ -4,7 +4,8 @@ import tensorflow as tf
 
 
 def learning_rate_decay(alpha, decay_rate, decay_step):
-    """Creates a learning rate decay operation in TensorFlow using inverse time decay.
+    """Creates a learning rate decay operation
+    in TensorFlow using inverse time decay.
 
     Args:
         alpha: The original learning rate.
@@ -17,9 +18,6 @@ def learning_rate_decay(alpha, decay_rate, decay_step):
     Returns:
         The learning rate decay operation.
     """
-
-    # Create a global step variable to track the number of training steps
-    global_step = tf.Variable(0, trainable=False)
 
     return tf.keras.optimizers.schedules.InverseTimeDecay(
         initial_learning_rate=alpha,
