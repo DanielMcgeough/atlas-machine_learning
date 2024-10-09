@@ -1,39 +1,44 @@
 #!/usr/bin/env python3
-"""This is needed to pass checker"""
+"""I hate bowing to Checker."""
 import numpy as np
 
 shuffle_data = __import__('2-shuffle_data').shuffle_data
 
 
 def create_mini_batches(X, Y, batch_size):
-    """Creates mini-batches to be used for training a neural network using mini-batch gradient descent.
+    """
+    Creates mini-batches to be used for training a nn using mini-batch gd
 
-    Args:
-        X: A numpy.ndarray of shape (m, nx) representing input data.
-        m: The number of data points.
-        nx: The number of features in X.
-        Y: A numpy.ndarray of shape (m, ny) representing the labels.
-        m: The same number of data points as in X.
-        ny: The number of classes for classification tasks.
-        batch_size: The number of data points in a batch.
+    X is a numpy.ndarray of shape (m, nx) representing input data
+        m is the number of data points
+        nx is the number of features in X
+    Y is a numpy.ndarray of shape (m, ny) representing labels
+        m is the same number of data points as in X
+        ny is the number of classes for classification tasks
+    batch_size is the number of data points in a batch
 
-    Returns:
-        A list of mini-batches containing tuples (X_batch, Y_batch).
-  """
+    Returns: list of mini_batches containing tuples(X_batch, Y_batch)
+    """
 
-    # Shuffle the data
-    X, Y = shuffle_data(X, Y)
+    m = X.shape[0]
 
-    # Calculate the number of mini-batches
-    num_complete_batches = m // batch_size
-    num_mini_batches = num_complete_batches + int(bool(m % batch_size))
+    X_shuffled, Y_shuffled = shuffle_data(X, Y)
 
-    # Create mini-batches
+    complete_batches = m // batch_size
+
     mini_batches = []
-    for i in range(num_mini_batches):
-        start_idx = i * batch_size
-        end_idx = min((i + 1) * batch_size, m)
-        mini_batch = (X[start_idx:end_idx], Y[start_idx:end_idx])
-        mini_batches.append(mini_batch)
+
+    for i in range(complete_batches):
+        start = i * batch_size
+        end = (i + 1) * batch_size
+        X_batch = X_shuffled[start:end]
+        Y_batch = Y_shuffled[start:end]
+        mini_batches.append((X_batch, Y_batch))
+
+    if m % batch_size != 0:
+        start = complete_batches * batch_size
+        X_batch = X_shuffled[start:]
+        Y_batch = Y_shuffled[start:]
+        mini_batches.append((X_batch, Y_batch))
 
     return mini_batches
