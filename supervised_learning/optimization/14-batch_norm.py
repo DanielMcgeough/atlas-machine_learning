@@ -1,40 +1,42 @@
 #!/usr/bin/env python3
-"""shorter than I remember"""
+"""This one was absolutely awful"""
 import tensorflow as tf
 
 
 def create_batch_norm_layer(prev, n, activation):
-    """Creates a batch normalization layer for a neural network in TensorFlow.   
+    """function that creates a batch normalization layer
+    for a normalization layer for a neural network in
+    tensorflow
+    prev is the activated output of the previous layer
+    n is the number of nodes in the layer to be created
+    activation is the activation function that should be used
+    on the output of the layer
+    you should use the tf.keras.layers.Dense layer as the base
+    layer with kernal initializer
+    your layer should incorporate two trainable parameters, gamma
+    and beta, initialized as vectors 1 and 0 respectively
+    you should use an epsilon of 1e-7
 
-
-    Args:
-        prev: The activated output of the previous layer.
-        n: The number of nodes in the layer to be created.
-        activation: The activation function that should be used on the output of the layer.
-
-    Returns:
-        A tensor of the activated output for the layer.
+    Returns: a tensor of the activated output for the layer
     """
-
-    # Create the dense layer with batch normalization
-    layer = tf.keras.layers.Dense(
+    dense = tf.keras.layers.Dense(
         units=n,
-        activation=activation,
-        kernel_initializer=tf.keras.initializers.VarianceScaling(mode='fan_avg'),
+        kernel_initializer=tf.keras.initializers.VarianceScaling(
+            mode='fan_avg')
+    )(prev)
 
-        use_bias=False
+    mean, variance = tf.nn.moments(dense, axes=[0])
+
+    gamma = tf.Variable(tf.ones([n]), trainable=True)
+    beta = tf.Variable(tf.zeros([n]), trainable=True)
+
+    bn = tf.nn.batch_normalization(
+        dense,
+        mean=mean,
+        variance=variance,
+        offset=beta,
+        scale=gamma,
+        variance_epsilon=1e-7
     )
 
-    # Apply batch normalization
-    bn = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-7, trainable=True)
-
-    # Create trainable parameters for gamma and beta
-    gamma = tf.Variable(tf.ones(shape=(n,)), name='gamma')
-    beta = tf.Variable(tf.zeros(shape=(n,)), name='beta')
-
-    # Apply the layer and batch normalization
-    output = layer(prev)
-    output = bn(output)
-    output = gamma * output + beta
-
-    return output
+    return activation(bn)
