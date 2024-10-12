@@ -4,37 +4,14 @@ import numpy as np
 
 
 def create_confusion_matrix(labels, logits):
-    """Creates a confusion matrix.
+    """Documentation"""
+    true_labels = labels.argmax(axis=1)
+    predicted_labels = logits.argmax(axis=1)
 
-    Args:
-        labels: A one-hot numpy.ndarray of shape (m, classes) containing the correct
-            labels for each data point.
-        logits: A one-hot numpy.ndarray of shape (m, classes) containing the predicted
-            labels.
+    con_mat = np.zeros((len(np.unique(true_labels)
+                            ), len(np.unique(predicted_labels))))
 
-    Returns:
-        A confusion numpy.ndarray of shape (classes, classes) with row indices
-        representing the correct labels and column
-            indices representing the predicted
-        labels.
+    for i, true_label in enumerate(true_labels):
+        con_mat[true_label, predicted_labels[i]] += 1
 
-    """
-
-    # Get the number of classes and data points
-    classes, _ = labels.shape
-    m, _ = logits.shape
-
-    # Create a confusion matrix initialized with zeros
-    confusion_matrix = np.zeros((classes, classes), dtype=int)
-
-    # Iterate over each data point
-    for i in range(m):
-        # Get the correct label index
-        correct_label_index = np.argmax(labels[i])
-        # Get the predicted label index
-        predicted_label_index = np.argmax(logits[i])
-
-        # Increment the corresponding element in the confusion matrix
-        confusion_matrix[correct_label_index, predicted_label_index] += 1
-
-    return confusion_matrix
+    return con_mat
