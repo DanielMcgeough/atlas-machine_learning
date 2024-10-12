@@ -2,6 +2,7 @@
 """saying stuff"""
 import numpy as np
 
+
 def create_confusion_matrix(labels, logits):
     """Creates a confusion matrix.
 
@@ -27,12 +28,6 @@ def create_confusion_matrix(labels, logits):
     # Create the confusion matrix
     confusion_matrix = np.zeros((classes, classes), dtype=int)
     for true_label, predicted_label in zip(true_labels, predicted_labels):
-        confusion_matrix[true_label, predicted_label]+= 1
-
-    # Print the confusion matrix with periods after each number
-    for row in confusion_matrix:
-        for element in row:
-            print(f"{element:.0f}.", end=" ")
-    print()
+        confusion_matrix[true_label, predicted_label] += 1
 
     return confusion_matrix
