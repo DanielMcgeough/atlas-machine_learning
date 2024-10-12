@@ -22,6 +22,7 @@ def create_confusion_matrix(labels, logits):
 
     """
 
+    classes = labels.shape[1]
     # Get the predicted labels by finding the index of
     # the maximum value in each row of logits
     predicted_labels = np.argmax(logits, axis=1)
