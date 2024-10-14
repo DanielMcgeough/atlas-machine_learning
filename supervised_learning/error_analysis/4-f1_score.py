@@ -20,6 +20,7 @@ def f1_score(confusion):
     precision = precision_func(confusion)
 
     f1_scores = 2 * (sensitivity * precision) / (sensitivity + precision)
-    f1_scores[np.isnan(f1_scores)] = 0  # Handle cases where sensitivity or precision is 0
+    f1_scores[np.isnan(f1_scores)] = 0
+    # Handle cases where sensitivity or precision is 0
 
     return f1_scores
