@@ -12,7 +12,7 @@ def specificity(confusion):
     num_classes = confusion.shape[0]
     true_positives = np.diag(confusion)
     true_negatives = np.diag(confusion)
-    false_positives = np.array([np.sum(row) - tp for tp, row in zip(true_positives, confusion.T)])
+    false_positives = np.array([np.sum(row) - tp for tp, row in zip(true_positives, confusion)])
 
     for i in range(num_classes):
         true_negatives = true_negatives[i]
