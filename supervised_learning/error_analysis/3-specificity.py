@@ -13,7 +13,7 @@ def specificity(confusion):
         A numpy.ndarray containing the specificity for each class.
     """
 
-    num_classes = confusion.shape[0]
+    num_classes = confusion.shape[1]
     specificity_values = np.zeros(num_classes)
 
     for i in range(num_classes):
