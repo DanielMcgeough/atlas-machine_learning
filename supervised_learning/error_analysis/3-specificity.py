@@ -3,14 +3,10 @@
 import numpy as np
 
 def specificity(confusion):
-    """Calculates specificity for each class in a confusion matrix.
-
-    Args:
-        confusion: A confusion matrix as a numpy.ndarray.
-
-    Returns:
-        A numpy.ndarray containing the specificity for each class.
-    """
+    """Calculates specificity-
+    ability of a model to correctly
+    identify negative cases.
+    It's also known as the true negative rate."""
 
     num_classes = confusion.shape[0]
     specificity_values = np.zeros(num_classes)
