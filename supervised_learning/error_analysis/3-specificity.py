@@ -2,23 +2,22 @@
 """Never know what to put here"""
 import numpy as np
 
-
 def specificity(confusion):
-    """Measures the ability of the model to
-    correctly identify negative cases.
-    A high specificity means the model is
-    good at avoiding false positives."""
-    specificity_return = []
+    """Calculates specificity for each class in a confusion matrix.
+
+    Args:
+        confusion: A confusion matrix as a numpy.ndarray.
+
+    Returns:
+        A numpy.ndarray containing the specificity for each class.
+    """
+
     num_classes = confusion.shape[0]
-    true_positives = np.diag(confusion)
-    true_negatives = np.diag(confusion)
-    false_positives = np.array([np.sum(row) - tp for tp, row in zip(true_positives, confusion)])
+    specificity_values = np.zeros(num_classes)
 
     for i in range(num_classes):
-        true_negatives = true_negatives[i]
-        false_positives = false_positives[i]
+        true_negatives = np.sum(confusion[np.arange(num_classes) != i, np.arange(num_classes) != i])
+        false_positives = np.sum(confusion[np.arange(num_classes) != i, i])
+        specificity_values[i] = true_negatives / (true_negatives + false_positives)
 
-        specificity = true_negatives / (true_negatives + false_positives) if false_positives > 0 else 1
-        specificity_return.append(specificity)
-
-    return specificity_return
+    return specificity_values
