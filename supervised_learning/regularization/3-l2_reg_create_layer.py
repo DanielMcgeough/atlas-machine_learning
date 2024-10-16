@@ -2,6 +2,7 @@
 """even in a job I wont stop this i bet."""
 import tensorflow as tf
 
+
 def l2_reg_create_layer(prev, n, activation, lambtha):
     """Creates a neural network layer with L2 regularization.
 
@@ -14,7 +15,6 @@ def l2_reg_create_layer(prev, n, activation, lambtha):
     Returns:
         The output of the new layer.
     """
-
 
     init = tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_avg')
     regularizer = tf.keras.regularizers.l2(lambtha)
