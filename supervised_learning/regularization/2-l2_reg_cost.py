@@ -1,40 +1,24 @@
 #!/usr/bin/env python3
-"""Is regularization always for only overfitting"""
+"""even in a job I wont stop this i bet."""
 import tensorflow as tf
 
+def l2_reg_cost(cost, model):
+    """Calculates the cost of a neural network with L2 regularization.
 
-def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
-    """
-    Updates the weights and biases of a neural network using
-    gradient descent with L2 regularization.
+    Args:
+        cost: A tensor containing the cost of the network without L2 regularization.   
 
-    Uses tanh activation for hidden layers and softmax for output layer.
+        model: A Keras model with L2 regularization applied to all layers.
 
-    Parameters:
-        Y: One-hot numpy.ndarray of shape (classes, m)
-            containing the labels for the data.
-            classes: number of classes.
-            m: number of data points.
-        weights: Dictionary of weights and biases of the neural network.
-        cache: Dictionary of outputs of each layer of the neural network.
-        alpha: Floating point learning rate.
-        lambtha: floating point L2 regularization parameter.
-        L: Integer of layers in the neural network.
+    Returns:
+        A tensor containing the total cost for each layer of the network, accounting for L2 regularization.
     """
 
-    m = Y.shape[1]
+    regularization_cost = 0
+    for layer in model.layers:
+        if hasattr(layer, 'kernel_regularizer') and layer.kernel_regularizer is not None:
+            regularization_cost += tf.reduce_sum(layer.kernel_regularizer(layer.kernel))
 
-    dZ = cache[f'A{L}'] - Y
+    total_cost = cost + regularization_cost
 
-    for layer in range(L, 0, -1):
-        A_prev = cache[f'A{layer - 1}']
-        dW = np.matmul(dZ, A_prev.T) / m
-        dW += (lambtha / m) * weights[f'W{layer}']
-        db = np.sum(dZ, axis=1, keepdims=True) / m
-        dA_prev = np.matmul(weights[f'W{layer}'].T, dZ)
-
-        if layer > 1:
-            dZ = dA_prev * (1 - A_prev ** 2)
-
-        weights[f'W{layer}'] -= alpha * dW
-        weights[f'b{layer}'] -= alpha * db
+    return total_cost
