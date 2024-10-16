@@ -2,6 +2,7 @@
 """even in a job I wont stop this i bet."""
 import numpy as np
 
+
 def dropout_forward_prop(X, weights, L, keep_prob):
     """Conducts forward propagation using Dropout.
 
@@ -12,7 +13,8 @@ def dropout_forward_prop(X, weights, L, keep_prob):
         keep_prob: The probability that a node will be kept.
 
     Returns:
-        A dictionary containing the outputs of each layer and the dropout mask used on each layer.
+        A dictionary containing the outputs of each layer
+        and the dropout mask used on each layer.
     """
 
     # cache = {}
