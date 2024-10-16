@@ -20,14 +20,14 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
     m = Y.shape[1]
 
     # Backward propagation
-    for l in reversed(range(L)):
-        if l == L - 1:
-            dA_prev = cache["A" + str(l + 1)] - Y
+    for i in reversed(range(L)):
+        if i == L - 1:
+            dA_prev = cache["A" + str(i + 1)] - Y
     else:
-        dA_prev = np.dot(weights["W" + str(l + 1)].T, dA_prev) * (1 - np.square(cache["A" + str(l)]))
+        dA_prev = np.dot(weights["W" + str(i + 1)].T, dA_prev) * (1 - np.square(cache["A" + str(i)]))
 
-    dW = (1 / m) * np.dot(dA_prev, cache["A" + str(l - 1)].T) + (lambtha / m) * weights["W" + str(l)]
+    dW = (1 / m) * np.dot(dA_prev, cache["A" + str(i - 1)].T) + (lambtha / m) * weights["W" + str(i)]
     db = (1 / m) * np.sum(dA_prev, axis=1, keepdims=True)
 
-    weights["W" + str(l)] -= alpha * dW
-    weights["b" + str(l)] -= alpha * db
+    weights["W" + str(i)] -= alpha * dW
+    weights["b" + str(i)] -= alpha * db
