@@ -14,11 +14,11 @@ def l2_reg_cost(cost, model):
         A tensor containing the total cost for each layer of the network, accounting for L2 regularization.
     """
 
-    regularization_cost = []
+    l2_costs = []
 
-    for layer in model.layers:
-        if isinstance(layer, tf.keras.layers.Dense) and layer.kernel_regularizer:
-            regularization_cost = layer.kernel_regularizer(layer.kernel)
-            regularization_cost.append(regularization_cost)
+    for lay in model.layers:
+        if isinstance(lay, tf.keras.layers.Dense) and lay.kernel_regularizer:
+            l2_cost = lay.kernel_regularizer(lay.kernel)
+            l2_costs.append(l2_cost)
 
-    return cost + tf.stack(regularization_cost)
+    return cost + tf.stack(l2_costs)
