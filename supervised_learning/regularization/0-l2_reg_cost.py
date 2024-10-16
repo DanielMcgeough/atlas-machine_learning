@@ -21,8 +21,8 @@ def l2_reg_cost(cost, lambtha, weights, L, m):
     """
 
     regularization_cost = 0
-    for l in range(1, L + 1):
-        regularization_cost += np.sum(np.square(weights["W" + str(l)]))
+    for i in range(1, L + 1):
+        regularization_cost += np.sum(np.square(weights["W" + str(i)]))
 
     regularization_cost *= lambtha / (2 * m)
     regularized_cost = cost + regularization_cost
