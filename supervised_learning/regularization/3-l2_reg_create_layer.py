@@ -15,12 +15,11 @@ def l2_reg_create_layer(prev, n, activation, lambtha):
         The output of the new layer.
     """
 
-    layer = tf.keras.layers.Dense(
-        units=n,
-        activation=activation,
-        kernel_regularizer=tf.keras.regularizers.l2(lambtha)
-    )
 
-    output = layer(prev)
+    init = tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_avg')
+    regularizer = tf.keras.regularizers.l2(lambtha)
+    output = tf.keras.layers.Dense(n, activation=activation,
+                                  kernel_regularizer=regularizer,
+                                  kernel_initializer=init)(prev)
 
     return output
