@@ -16,7 +16,7 @@ def l2_reg_cost(cost, lambtha, weights, L, m):
 
     Returns:
         The cost
-        of the network accounting for L2 regularization.   
+        of the network accounting for L2 regularization.
 
     """
 
