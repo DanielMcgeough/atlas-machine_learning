@@ -16,12 +16,12 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
 
     x = inputs
     for i in range(len(layers)):
-        x = K.layers.Dense(units=layers[i],
+        x = K.layers.Dense(layers[i],
                            activation=activations[i],
                            kernel_regularizer=tf.keras.regularizers.l2(lambtha))(x)
-        x = K.layers.Dropout(rate=1 - keep_prob)(x)
-    outputs = K.layers.Dense(units=1,
-                             activation='sigmoid')(x)
-    model = K.Model(inputs=inputs, outputs=outputs)
+        if i < len(layers) - 1:
+            x = K.layers.Dropout(1 - keep_prob)(x)
+
+    model = K.Model(inputs=inputs, outputs=x)
 
     return model
