@@ -13,11 +13,14 @@ def test_model(network, data, labels, verbose=True):
         with.
         labels: The correct one-hot labels
          of the data.
-        verbose: A boolean that determines if output should be printed during the testing process.
+        verbose: A boolean that determines
+        if output should be printed during
+        the testing process.
 
     Returns:
         The loss and accuracy of
-        the model with the testing data, respectively.
+        the model with the testing data,
+        respectively.
     """
 
     return network.evaluate(data, labels, verbose=verbose)
