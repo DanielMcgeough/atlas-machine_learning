@@ -18,12 +18,12 @@ def save_weights(network, filename, save_format='keras'):
 
 
 def load_weights(network, filename):
-        """Loads a model's weights.
+    """Loads a model's weights.
 
-        Args:
-            network: The model to which the weights should be loaded.
-            filename: The path of the file that the weights should be loaded   
-            from.
-        """
+    Args:
+        network: The model to which the weights should be loaded.
+        filename: The path of the file that the weights should be loaded
+        from.
+    """
 
-        network.load_weights(filename)
+    network.load_weights(filename)
