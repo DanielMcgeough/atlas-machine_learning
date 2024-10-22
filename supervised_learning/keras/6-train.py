@@ -25,7 +25,7 @@ def train_model(network,
         callbacks.append(K.callbacks.EarlyStopping(
             monitor='val_loss', patience=patience
         ))
-        
+
     return network.fit(
         data,
         labels,
@@ -33,5 +33,6 @@ def train_model(network,
         epochs=epochs,
         validation_data=validation_data,
         verbose=verbose,
-        shuffle=shuffle
+        shuffle=shuffle,
+        callbacks=callbacks
     )
