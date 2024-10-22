@@ -8,8 +8,10 @@ def save_config(network, filename):
     """Saves a model's configuration in JSON format.
 
     Args:
-        network: The model whose configuration should be saved.
-        filename: The path of the file that the configuration should be   
+        network: The model whose configuration
+        should be saved.
+        filename: The path of the file that the
+        configuration should be
      saved to.
     """
 
@@ -22,7 +24,9 @@ def load_config(filename):
     """Loads a model with a specific configuration.
 
     Args:
-        filename: The path of the file containing the model's configuration in JSON format.
+        filename: The path of the file
+        containing the model's configuration
+        in JSON format.
 
     Returns:
         The loaded model.
