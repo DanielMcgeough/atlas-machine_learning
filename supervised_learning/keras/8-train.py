@@ -43,11 +43,10 @@ def train_model(network,
 
     if save_best and filepath and validation_data:
         callbacks.append(K.callbacks.ModelCheckpoint(
-            filepath=filepath,
+            filepath,
             save_best_only=True,
             monitor='val_loss',
-            mode='min',
-            verbose=1))
+            mode='min'))
 
     K.backend.set_value(network.optimizer.learning_rate, alpha)
 
