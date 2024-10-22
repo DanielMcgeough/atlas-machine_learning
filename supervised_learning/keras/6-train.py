@@ -19,7 +19,7 @@ def train_model(network,
     GD and adds a validation data
     parameter to analyze. Now we are
     also adding an early stop functionality"""
-    
+
     callbacks = []
     if early_stopping and validation_data:
         callbacks.append(K.callbacks.EarlyStopping(
