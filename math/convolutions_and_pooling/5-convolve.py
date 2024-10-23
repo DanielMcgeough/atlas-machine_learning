@@ -24,30 +24,35 @@ def convolve(images, kernels, padding='same', stride=(1, 1)):
     """
 
     m, h, w, c = images.shape
-    kh, kw, _, nc = kernels.shape
+    kh, kw, kc, nc = kernels.shape
     sh, sw = stride
 
-    # Calculate padding based on padding mode
+    assert c == kc, "Image channels and kernel channels must match"
+
     if padding == 'same':
-        ph = (h * sh - h + kh - 1) // 2
-        pw = (w * sw - w + kw - 1) // 2
+        ph = ((h - 1) * sh + kh - h + 1) // 2
+        pw = ((w - 1) * sw + kw - w + 1) // 2
+
     elif padding == 'valid':
-        ph = 0
-        pw = 0
+        ph, pw = 0, 0
+
     else:
         ph, pw = padding
 
-    # Pad the images
-    images = np.pad(images, ((0, 0), (ph, ph), (pw, pw), (0, 0)), mode='constant')
+    images_padded = np.pad(images, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
+                           mode='constant')
 
-    # Calculate the output shape
-    output_shape = (m, (h + 2*ph - kh + 1) // sh, (w + 2*pw - kw + 1) // sw, nc)
-    output = np.zeros(output_shape)
+    output_h = (h + 2 * ph - kh) // sh + 1
+    output_w = (w + 2 * pw - kw) // sw + 1
+    output = np.zeros((m, output_h, output_w, nc))
 
-    # Perform the convolution
-    for i in range(0, output_shape[1], sh):
-        for j in range(0, output_shape[2], sw):
+    for i in range(output_h):
+        for j in range(output_w):
             for k in range(nc):
-                output[:, i, j, k] = np.sum(images[:, i:i+kh, j:j+kw, :] * kernels[:, :, :, k], axis=(1, 2, 3))
+                output[:, i, j, k] = np.sum(
+                    images_padded[:, i*sh:i*sh+kh, j*sw:j*sw+kw, :]
+                    * kernels[..., k],
+                    axis=(1, 2, 3)
+                )
 
     return output
