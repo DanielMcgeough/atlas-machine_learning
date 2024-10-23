@@ -25,7 +25,7 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
     """
 
     m, h, w, c = images.shape
-    kh, kw, _ = kernel.shape
+    kh, kw, kc = kernel.shape
     sh, sw = stride
 
     assert c == kc, "Image channels and kernel channels must match"
