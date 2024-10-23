@@ -30,11 +30,10 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     # Calculate padding based on padding mode
     if padding == 'same':
-        ph = (h * sh - h + kh - 1) // 2
-        pw = (w * sw - w + kw - 1) // 2
+        ph = ((h - 1) * sh + kh - h) // 2 + (kh % 2 == 0)
+        pw = ((w - 1) * sw + kw - w) // 2 + (kw % 2 == 0)
     elif padding == 'valid':
-        ph = 0
-        pw = 0
+        ph, pw = 0, 0
     else:
         ph, pw = padding
 
