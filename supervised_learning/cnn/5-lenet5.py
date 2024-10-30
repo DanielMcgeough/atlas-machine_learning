@@ -2,6 +2,7 @@
 """Sometimes I hate this"""
 from tensorflow import keras as K
 
+
 def lenet5(X):
     """
     Builds a modified LeNet-5 architecture using Keras.
