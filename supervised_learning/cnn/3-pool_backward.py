@@ -2,6 +2,7 @@
 """Sometimes I hate this"""
 import numpy as np
 
+
 def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
     """
     Performs backward propagation for a pooling layer.
