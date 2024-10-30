@@ -23,28 +23,23 @@ def pool_forward(A_prev, kernel_shape, stride=(1, 1), mode='max'):
         layer
   """
 
-    (m, h_prev, w_prev, c_prev) = A_prev.shape
-    (kh, kw) = kernel_shape
-    (sh, sw) = stride
+    m, h, w, c = A_prev.shape
+    kh, kw = kernel_shape
+    sh, sw = stride
 
-    # Calculate output dimensions
-    h_new = int(1 + (h_prev - kh) / sh)
-    w_new = int(1 + (w_prev - kw) / sw)
+    output_h = (h - kh) // sh + 1
+    output_w = (w - kw) // sw + 1
+    output = np.zeros((m, output_h, output_w, c))
 
-    # Initialize output array
-    A = np.zeros((m, h_new, w_new, c_prev))
+    for i in range(output_h):
+        for j in range(output_w):
+            if mode == 'max':
+                output[:, i, j, :] = np.max(
+                    A_prev[:, i*sh:i*sh+kh, j*sw:j*sw+kw, :], axis=(1, 2)
+                )
+            elif mode == 'avg':
+                output[:, i, j, :] = np.mean(
+                    A_prev[:, i*sh:i*sh+kh, j*sw:j*sw+kw, :], axis=(1, 2)
+                )
 
-    for h in range(h_new):
-        for w in range(w_new):
-            for c in range(c_prev):
-                vert_start = h * sh
-                vert_end = vert_start + kh
-                horiz_start = w * sw
-                horiz_end = horiz_start + kw
-
-        if mode == 'max':
-          A[:, h, w, c] = np.max(A_prev[:, vert_start:vert_end, horiz_start:horiz_end, c], axis=(1, 2))
-        elif mode == 'avg':
-          A[:, h, w, c] = np.mean(A_prev[:, vert_start:vert_end, horiz_start:horiz_end, c], axis=(1, 2))
-
-    return A
+    return output
