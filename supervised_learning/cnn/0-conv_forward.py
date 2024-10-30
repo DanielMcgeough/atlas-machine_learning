@@ -5,18 +5,23 @@ import numpy as np
 
 def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
     """
-    Performs forward propagation for a convolutional layer.
+    Performs forward propagation for a
+    convolutional layer.
 
     Args:
-        A_prev: Output activations of the previous layer (m, h_prev, w_prev, c_prev)
-        W: Weights (filters) (kh, kw, c_prev, c_new)
+        A_prev: Output activations of the
+        previous layer (m, h_prev, w_prev,
+        c_prev)
+        W: Weights (filters) (kh, kw, c_prev,
+        c_new)
         b: Biases (1, 1, 1, c_new)
         activation: Activation function
         padding: 'same' or 'valid'
         stride: Tuple (sh, sw)
 
     Returns:
-        Output activations of the current layer
+        Output activations of the current
+        layer
     """
 
     m, h_prev, w_prev, c_prev = A_prev.shape
