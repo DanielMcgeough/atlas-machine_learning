@@ -26,29 +26,34 @@ def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
         previous layer
     """
 
-    (m, h_prev, w_prev, c_prev) = A_prev.shape
-    (m, h_new, w_new, c_new) = dA.shape
-    (kh, kw) = kernel_shape
-    (sh, sw) = stride
+    m, h_new, w_new, c_new = dA.shape
+    m, h_prev, w_prev, c = A_prev.shape
+    kh, kw = kernel_shape
+    sh, sw = stride
 
     dA_prev = np.zeros_like(A_prev)
 
+    for i in range(m):
+        for j in range(h_new):
+            for k in range(w_new):
+                for c in range(c_new):
+                    vert_start = j * sh
+                    vert_end = vert_start + kh
+                    horiz_start = k * sw
+                    horiz_end = horiz_start + kw
 
-    for i in range(h_new):
-        for j in range(w_new):
-            for c in range(c_new):
-                vert_start = i * sh
-                vert_end = vert_start + kh
-                horiz_start = j * sw
-                horiz_end = horiz_start + kw
+                    if mode == 'max':
+                        a_slice = A_prev[i, vert_start:vert_end,
+                                         horiz_start:horiz_end, c]
+                        mask = (a_slice == np.max(a_slice))
+                        dA_prev[i, vert_start:vert_end,
+                                horiz_start:horiz_end, c] += \
+                            mask * dA[i, j, k, c]
 
-        if mode == 'max':
-          # Find the index of the maximum value in the pool region
-          max_idx = np.argmax(A_prev[:, vert_start:vert_end, horiz_start:horiz_end, c], axis=(1, 2))
-          # Set the gradient at the maximum position
-          for k in range(m):
-            dA_prev[k, vert_start:vert_end, horiz_start:horiz_end, c][k, max_idx[k, 0], max_idx[k, 1]] = dA[k, i, j, c]
-        elif mode == 'avg':
-          dA_prev[:, vert_start:vert_end, horiz_start:horiz_end, c] += dA[:, i, j, c][:, np.newaxis, np.newaxis] / (kh * kw)
+                    elif mode == 'avg':
+                        dA_curr = dA[i, j, k, c]
+                        dA_avg = dA_curr / (kh * kw)
+                        dA_prev[i, vert_start:vert_end,
+                                horiz_start:horiz_end, c] += dA_avg
 
     return dA_prev
