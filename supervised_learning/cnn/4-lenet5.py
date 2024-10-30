@@ -18,57 +18,37 @@ def lenet5(x, y):
             - The accuracy tensor.
     """
 
-    # Convolutional Layer 1
-    W1 = tf.get_variable("W1", shape=[5, 5, 1, 6], initializer=tf.keras.initializers.VarianceScaling(scale=2.0))
-    b1 = tf.Variable(tf.zeros([1, 1, 1, 6]))
-    Z1 = tf.nn.conv2d(x, W1, strides=[1, 1, 1, 1], padding='SAME') + b1
-    A1 = tf.nn.relu(Z1)
+    he_normal = tf.keras.initializers.VarianceScaling(scale=2.0)
 
-    # Pooling Layer 1
-    P1 = tf.nn.max_pool(A1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
+    conv1 = tf.layers.conv2d(x, filters=6, kernel_size=5, padding='same',
+                             activation=tf.nn.relu,
+                             kernel_initializer=he_normal)
 
-    # Convolutional Layer 2
-    W2 = tf.get_variable("W2", shape=[5, 5, 6, 16], initializer=tf.keras.initializers.VarianceScaling(scale=2.0))
-    b2 = tf.Variable(tf.zeros([1, 1, 1, 16]))
-    Z2 = tf.nn.conv2d(P1, W2, strides=[1, 1, 1, 1], padding='VALID') + b2
-    A2 = tf.nn.relu(Z2)
+    pool1 = tf.layers.max_pooling2d(conv1, pool_size=2, strides=2)
 
-    # Pooling Layer 2
-    P2 = tf.nn.max_pool(A2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
+    conv2 = tf.layers.conv2d(pool1, filters=16, kernel_size=5, padding='valid',
+                             activation=tf.nn.relu,
+                             kernel_initializer=he_normal)
 
-    # Flatten
-    P2 = tf.contrib.layers.flatten(P2)
+    pool2 = tf.layers.max_pooling2d(conv2, pool_size=2, strides=2)
 
-    # Fully Connected Layer 1
-    W3 = tf.get_variable("W3", shape=[400, 120], initializer=tf.keras.initializers.VarianceScaling(scale=2.0))
-    b3 = tf.Variable(tf.zeros([120]))
-    Z3 = tf.matmul(P2, W3) + b3
-    A3 = tf.nn.relu(Z3)
+    flat = tf.layers.flatten(pool2)
 
-    # Fully Connected Layer 2
-    W4 = tf.get_variable("W4", shape=[120, 84], initializer=tf.keras.initializers.VarianceScaling(scale=2.0))
-    b4 = tf.Variable(tf.zeros([84]))
-    Z4 = tf.matmul(A3, W4) + b4
-    A4 = tf.nn.relu(Z4)
+    fcl1 = tf.layers.dense(flat, units=120, activation=tf.nn.relu,
+                          kernel_initializer=he_normal)
 
-    # Output Layer
-    W5 = tf.get_variable("W5", shape=[84, 10], initializer=tf.keras.initializers.VarianceScaling(scale=2.0))
-    b5 = tf.Variable(tf.zeros([10]))
-    Z5 = tf.matmul(A4, W5) + b5
+    fcl2 = tf.layers.dense(fcl1, units=84, activation=tf.nn.relu,
+                          kernel_initializer=he_normal)
 
-    # Softmax Activation
-    logits = Z5
-    predictions = tf.nn.softmax(logits)
+    logits = tf.layers.dense(fcl2, units=10, kernel_initializer=he_normal)
+    output = tf.nn.softmax(logits)
 
-    # Loss and Optimization
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=y))
-    optimizer = tf.train.AdamOptimizer()
-    train_op = optimizer.minimize(loss)
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2
+                          (logits=logits, labels=y))
 
+    train_op = tf.train.AdamOptimizer().minimize(loss)
 
-    # Accuracy
-    correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(y, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    correct = tf.equal(tf.argmax(output, 1), tf.argmax(y, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
 
-
-    return predictions, train_op, loss, accuracy
+    return output, train_op, loss, accuracy
