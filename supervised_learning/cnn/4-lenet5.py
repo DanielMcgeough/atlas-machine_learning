@@ -2,6 +2,7 @@
 """Sometimes I hate this"""
 import tensorflow.compat.v1 as tf
 
+
 def lenet5(x, y):
     """
     Builds a modified LeNet-5 architecture.
@@ -35,10 +36,10 @@ def lenet5(x, y):
     flat = tf.layers.flatten(pool2)
 
     fcl1 = tf.layers.dense(flat, units=120, activation=tf.nn.relu,
-                          kernel_initializer=he_normal)
+                        kernel_initializer=he_normal)
 
     fcl2 = tf.layers.dense(fcl1, units=84, activation=tf.nn.relu,
-                          kernel_initializer=he_normal)
+                        kernel_initializer=he_normal)
 
     logits = tf.layers.dense(fcl2, units=10, kernel_initializer=he_normal)
     output = tf.nn.softmax(logits)
