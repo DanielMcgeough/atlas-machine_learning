@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""hahahahah"""
 import numpy as np
 import cv2
 
