@@ -11,10 +11,12 @@ def inception_block(A_prev, filters):
 
     Args:
         A_prev: The output from the previous layer.
-        filters: A tuple or list containing F1, F3R, F3, F5R, F5, FPP, respectively.
+        filters: A tuple or list containing
+        F1, F3R, F3, F5R, F5, FPP, respectively.
 
     Returns:
-        The concatenated output of the inception block.
+        The concatenated output of the
+        inception block.
     """
 
     # 1x1 Convolution Branch
