@@ -28,7 +28,7 @@ def identity_block(A_prev, filters):
 
         Returns: the activated output of the
         indentity block"""
-    
+
     F11, F3, F12 = filters
     init = K.initializers.he_normal(0)
 
