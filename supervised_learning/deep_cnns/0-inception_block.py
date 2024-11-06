@@ -49,7 +49,7 @@ def inception_block(A_prev, filters):
 
     # Pooling Branch
     pool = K.layers.MaxPooling2D((3, 3),
-                                 strides=(1,1),
+                                 strides=(1, 1),
                                  padding='same')(A_prev)
 
     pool = K.layers.Conv2D(filters[5],
