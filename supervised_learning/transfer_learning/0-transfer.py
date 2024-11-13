@@ -30,6 +30,7 @@ def train_cifar10_model():
     x_test, y_test = preprocess_data(x_test, y_test)
 
     # Create the base model using VGG16 as a base is usually adequate
+    # It was trained on imagenet so for image classification it is fantastic
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
     # Freeze the base model this prevents the layers in the model from being adjusted
