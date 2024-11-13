@@ -8,7 +8,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical 
-
+import numpy as np
 
 def preprocess_data(X, Y):
     # Normalize the image data because CIFAR-10
