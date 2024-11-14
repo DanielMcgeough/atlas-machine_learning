@@ -21,7 +21,7 @@ def preprocess_data(X, Y):
     # One-hot encode the labels
     Y = to_categorical(Y, 10)
     print(f"Error:31")
-    return (X, Y)
+    return(X, Y)
 
 def train_cifar10_model():
     print(f"Error: 1")
