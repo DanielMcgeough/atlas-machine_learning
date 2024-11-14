@@ -10,6 +10,8 @@ from keras.optimizers import Adam
 from keras.datasets import cifar10
 from keras.utils import to_categorical 
 import numpy as np
+import h5py
+
 
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
