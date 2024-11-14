@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Lots of stuff to setup"""
 import tensorflow as tf
+import keras as K
 # from keras.layers import Lambda
-from tensorflow.keras.applications import VGG16
+from keras.applications import VGG16
 from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
@@ -20,8 +21,10 @@ def preprocess_data(X, Y):
 
     # One-hot encode the labels
     Y = to_categorical(Y, 10)
-    print(f"Error:31")
+    print(f"kill em")
     return(X, Y)
+    
+print(f'ooooh')
 
 def train_cifar10_model():
     print(f"Error: 1")
