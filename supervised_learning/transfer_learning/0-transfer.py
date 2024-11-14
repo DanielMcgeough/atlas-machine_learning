@@ -3,12 +3,12 @@
 import tensorflow as tf
 from tensorflow import keras as K
 from keras.layers import Lambda
-from tensorflow.keras.applications import VGG16
-from tensorflow.keras.layers import Dense, Flatten, Dropout
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.utils import to_categorical 
+from keras.applications import VGG16
+from keras.layers import Dense, Flatten, Dropout
+from keras.models import Model
+from keras.activations import Adam
+from keras.datasets import cifar10
+from keras.losses import to_categorical 
 import numpy as np
 
 
