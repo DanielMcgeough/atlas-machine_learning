@@ -11,6 +11,7 @@ from keras.datasets import cifar10
 from keras.utils import to_categorical 
 import numpy as np
 
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
 def preprocess_data(X, Y):
     # Normalize the image data because CIFAR-10
