@@ -2,7 +2,7 @@
 """Lots of stuff to setup"""
 import tensorflow as tf
 from tensorflow import keras as K
-from keras.layers import Lambda
+# from keras.layers import Lambda
 from keras.applications import VGG16
 from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
