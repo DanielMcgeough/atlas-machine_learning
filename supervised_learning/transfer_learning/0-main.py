@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from tensorflow import keras as K
-
+from tensorflow.python.keras import backend as K
 
 preprocess_data = __import__('0-transfer').preprocess_data
 
