@@ -10,6 +10,7 @@ from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical 
 import numpy as np
 
+
 def preprocess_data(X, Y):
     # Normalize the image data because CIFAR-10
     # has pictures that are 32 by 32 pixels so
@@ -18,10 +19,11 @@ def preprocess_data(X, Y):
 
     # One-hot encode the labels
     Y = to_categorical(Y, 10)
-
-    return X, Y
+    print(f"Error:31")
+    print(X, Y)
 
 def train_cifar10_model():
+    print(f"Error: 1")
     # Load the CIFAR-10 dataset
     (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
@@ -33,6 +35,7 @@ def train_cifar10_model():
     # It was trained on imagenet so for image classification it is fantastic
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
+    print(f"Error:2")
     # Freeze the base model this prevents the layers in the model from being adjusted
     for layer in base_model.layers:
         layer.trainable = False
@@ -43,7 +46,7 @@ def train_cifar10_model():
     x = Dense(256, activation='relu')(x)
     x = Dropout(0.5)(x)
     predictions = Dense(10, activation='softmax')(x)
-
+    print(f"Error:3")
     # Create the final model
     model = Model(inputs=base_model.input, outputs=predictions)
 
@@ -52,13 +55,13 @@ def train_cifar10_model():
     model.compile(optimizer=Adam(learning_rate=0.0001),
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-
+    print(f"Error:4")
     # Training the model with ten epochs
     history = model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y_test))
 
     # Save the model
     model.save('cifar10.h5')
-
+    print(f"Error:5")
     # The script won't run when imported per the instructions
     if __name__ == '__main__':
         train_cifar10_model()
