@@ -6,9 +6,9 @@ from keras.layers import Lambda
 from keras.applications import VGG16
 from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
-from keras.activations import Adam
+from keras.optimizers import Adam
 from keras.datasets import cifar10
-from keras.losses import to_categorical 
+from keras.utils import to_categorical 
 import numpy as np
 
 
