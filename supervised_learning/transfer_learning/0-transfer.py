@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import tensorflow as tf
 from tensorflow.keras.applications import VGG16
-from tensorflow.keras.layers import Dense, Flatten, Dropout, Lambda
+from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.datasets import cifar10
@@ -50,8 +50,19 @@ def train_cifar10_model():
 
                   metrics=['accuracy'])
 
+    # Try some Data Augmentation
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator (
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest'
+    )
+
     # Train the model
-    history = model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y_test))
+    history = model.fit(datagen.flow(x_train, y_train, batch_size=32), epochs=50, validation_data=(x_test, y_test))
 
     # Save the model
     model.save('cifar10.h5')
