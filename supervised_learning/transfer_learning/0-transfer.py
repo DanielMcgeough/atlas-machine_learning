@@ -29,16 +29,19 @@ def train_cifar10_model():
     # Create the base model
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
-    # Freeze the base model
-    for layer in base_model.layers:
-        layer.trainable = False
+    # # Freeze the base model
+    # for layer in base_model.layers:
+    #     layer.trainable = False
+    # Unfreeze top layers
+    for layer in base_model.layers[-5:]:
+        layer.trainable = True
 
 
     # Add custom layers on top
     x = base_model.output
     x = Flatten()(x)
-    x = Dense(256, activation='relu')(x)
-    # x = Dropout(0.5)(x)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.5)(x)
     predictions = Dense(10, activation='softmax')(x)
 
     # Create the final model
@@ -51,18 +54,18 @@ def train_cifar10_model():
                   metrics=['accuracy'])
 
     # # Try some Data Augmentation
-    # datagen = tf.keras.preprocessing.image.ImageDataGenerator (
-    #     rotation_range=40,
-    #     width_shift_range=0.2,
-    #     height_shift_range=0.2,
-    #     shear_range=0.2,
-    #     zoom_range=0.2,
-    #     horizontal_flip=True,
-    #     fill_mode='nearest'
-    # )
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator (
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest'
+    )
 
     # Train the model
-    history = model.fit(x_train, y_train, batch_size=32, epochs=10, validation_data=(x_test, y_test))
+    history = model.fit(x_train, y_train, batch_size=64, epochs=10, validation_data=(x_test, y_test))
 
     # Save the model
     model.save('cifar10.h5')
