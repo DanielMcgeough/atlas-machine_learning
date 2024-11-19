@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
 import numpy as np
@@ -38,14 +38,14 @@ def train_cifar10_model():
     x = base_model.output
     x = Flatten()(x)
     x = Dense(256, activation='relu')(x)
-    x = Dropout(0.5)(x)
+    # x = Dropout(0.5)(x)
     predictions = Dense(10, activation='softmax')(x)
 
     # Create the final model
     model = Model(inputs=base_model.input, outputs=predictions)
 
     # Compile the model
-    model.compile(optimizer=Adam(learning_rate=0.0001),
+    model.compile(optimizer=RMSprop(learning_rate=0.0001),
                   loss='categorical_crossentropy',
 
                   metrics=['accuracy'])
@@ -62,7 +62,7 @@ def train_cifar10_model():
     # )
 
     # Train the model
-    history = model.fit(x_train, y_train, batch_size=32, epochs=50, validation_data=(x_test, y_test))
+    history = model.fit(x_train, y_train, batch_size=32, epochs=10, validation_data=(x_test, y_test))
 
     # Save the model
     model.save('cifar10.h5')
