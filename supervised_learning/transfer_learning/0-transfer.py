@@ -30,11 +30,11 @@ def train_cifar10_model():
     # Create the base model
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
-    # # Freeze the base model
+    # Freeze the base model
     # for layer in base_model.layers:
     #     layer.trainable = False
     # Unfreeze top layers
-    for layer in base_model.layers[-5:]:
+    for layer in base_model.layers[-3:]:
         layer.trainable = True
 
 
@@ -42,7 +42,7 @@ def train_cifar10_model():
     x = base_model.output
     x = Flatten()(x)
     x = Dense(256, activation='relu', kernel_regularizer=l2(0.01))(x)
-    x = Dropout(0.35)(x)
+    # x = Dropout(0.35)(x)
     predictions = Dense(10, activation='softmax')(x)
 
     # Create the final model
