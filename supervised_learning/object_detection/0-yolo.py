@@ -8,8 +8,9 @@ from tensorflow import keras as K
 
 class Yolo:
     """ Class initiliazes the Yolo v3 algorithm to perform object detection
-    It accomplish this by addressing certain things needed to establish bounding
-    boxes and other aspects of image detection with localization"""
+    It accomplish this by addressing certain things needed
+    to establish bounding boxes and other aspects of
+    image detection with localization"""
 
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
         """
