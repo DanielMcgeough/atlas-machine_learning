@@ -43,4 +43,18 @@ class Yolo:
 
 def process_outputs(self, outputs, image_size):
         boxes, box_confidences, box_class_probs = [], [], []
+        image_height, image_width = image_size
 
+        for idx, outpout in enumerate(outputs):
+            grid_height, grid_width, anchor+boxes, _ = output.shape
+
+            cx = np.arange(grid_width).reshape(1, grid_width, 1)
+            cy = np.arange(grid_height).reshape(grid_height, 1, 1)
+
+            bx = output[..., 0]
+            by = output[..., 1]
+            bw = output[..., 2]
+            bh = output[..., 3]
+
+            pw = self.anchors[idx, :, 0]
+            ph = self.anchors[idx, :, 1]
