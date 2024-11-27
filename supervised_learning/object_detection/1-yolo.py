@@ -56,5 +56,16 @@ def process_outputs(self, outputs, image_size):
             bw = output[..., 2]
             bh = output[..., 3]
 
+            bx = (1 / (1 + np.exp(-bx)) + cx) / grid_width
+            by = (1 / (1 + np.exp(-by)) + cy) / grid_height
+
             pw = self.anchors[idx, :, 0]
             ph = self.anchors[idx, :, 1]
+
+            bw = pw * np.exp(bw) / self.model.input.shape[1]
+            bh = ph * np.exp(bh) / self.model.input.shape[2]
+
+            x1 = (bx - bw / 2) * image_width
+            y1 = (by - bh / 2) * image_height
+            x2 = (bx + bw / 2) * image_width
+            y2 = (by + bh / 2) * image_height
