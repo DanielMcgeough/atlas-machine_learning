@@ -78,18 +78,30 @@ class Yolo:
 
         return boxes, box_confidences, box_class_probs
 
+
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
-        """Filters boxes and returns filtered boxes, classes, and scores.
-
-        Args:
-            boxes: A list of numpy arrays of shape (grid_height, grid_width, anchor_boxes, 4).
-            box_confidences: A list of numpy arrays of shape (grid_height, grid_width, anchor_boxes, 1).
-            box_class_probs: A list of numpy arrays of shape (grid_height, grid_width, anchor_boxes, classes).
-
-        Returns:
-            A tuple of (filtered_boxes, box_classes, box_scores).
         """
+        Filter detected boxes based on confidence and NMS
+        """
+        filtered_boxes = []
+        filtered_confidences = []
+        filtered_classes = []
 
-        all_boxes = np.concatenate([a.reshape(-1, 4) for a in boxes], axis=0)
-        all_scores = np.concatenate([a.reshape(-1) for a in box_confidences], axis=0)
-        all_classes = np.argmax(np.concatenate([a.reshape(-1, -1) for a in box_class_probs], axis=0), axis=1)
+        # Iterate through each scale's predictions
+        for box, confidence, class_prob in zip(boxes, box_confidences, box_class_probs):
+            # Compute class-specific confidence
+            class_scores = confidence * class_prob
+        
+            # Find indices where max class score is above threshold
+            mask = class_scores.max(axis=-1) >= self.class_t
+        
+            # Apply mask to boxes and scores
+            filtered_scale_boxes = box[mask]
+            filtered_scale_confidences = confidence[mask]
+            filtered_scale_classes = class_prob[mask]
+        
+            filtered_boxes.append(filtered_scale_boxes)
+            filtered_confidences.append(filtered_scale_confidences)
+            filtered_classes.append(filtered_scale_classes)
+
+        return filtered_boxes, filtered_confidences, filtered_classes
