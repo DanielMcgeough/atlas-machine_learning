@@ -26,7 +26,9 @@ class Yolo:
 
     def process_outputs(self, outputs, image_size):
         """Processes outputs from Darknet model for one image"""
-        boxes, box_confidences, box_class_probs = []
+        boxes = []
+        box_confidences = []
+        box_class_probs = []
         image_height, image_width = image_size
 
         for idx, output in enumerate(outputs):
@@ -37,22 +39,22 @@ class Yolo:
             cy = np.arange(grid_height).reshape(grid_height, 1, 1)
 
             # Extract and process box coordinates
-            bx = output[..., 0]
-            by = output[..., 1]
-            bw = output[..., 2]
-            bh = output[..., 3]
+            tx = output[..., 0]
+            ty = output[..., 1]
+            tw = output[..., 2]
+            th = output[..., 3]
 
             # Apply sigmoid to tx, ty, and confidence
-            bx = (1 / (1 + np.exp(-bx)) + cx) / grid_width
-            by = (1 / (1 + np.exp(-by)) + cy) / grid_height
+            bx = (1 / (1 + np.exp(-tx)) + cx) / grid_width
+            by = (1 / (1 + np.exp(-ty)) + cy) / grid_height
 
             # Get anchor boxes for this output scale
             pw = self.anchors[idx, :, 0]
             ph = self.anchors[idx, :, 1]
 
             # Calculate width and height of boxes
-            bw = pw * np.exp(bw) / self.model.input.shape[1]
-            bh = ph * np.exp(bh) / self.model.input.shape[2]
+            bw = pw * np.exp(tw) / self.model.input.shape[1]
+            bh = ph * np.exp(th) / self.model.input.shape[2]
 
             # Calculate x1, y1, x2, y2
             x1 = (bx - bw / 2) * image_width
