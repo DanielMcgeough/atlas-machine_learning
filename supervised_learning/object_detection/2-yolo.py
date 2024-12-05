@@ -88,7 +88,11 @@ class Yolo:
             boxes, box_confidences, box_class_probs
         ):
             # Reshape and flatten the inputs
-            box_count = output_boxes.shape[0] * output_boxes.shape[1] * output_boxes.shape[2]
+            box_count = (
+                output_boxes.shape[0] *
+                output_boxes.shape[1] *
+                output_boxes.shape[2]
+            )
             boxes_flat = output_boxes.reshape(box_count, 4)
             confidences_flat = output_confidences.reshape(box_count)
             class_probs_flat = output_class_probs.reshape(box_count, -1)
