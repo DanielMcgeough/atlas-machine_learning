@@ -25,7 +25,8 @@ class Yolo:
 
 
     def process_outputs(self, outputs, image_size):
-        """Processes outputs from Darknet model for one image"""
+        """Processes outputs from
+        Darknet model for one image"""
         boxes = []
         box_confidences = []
         box_class_probs = []
