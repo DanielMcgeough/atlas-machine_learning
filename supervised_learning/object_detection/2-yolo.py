@@ -80,28 +80,36 @@ class Yolo:
 
 
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
-        """
-        Filter detected boxes based on confidence and NMS
-        """
-        filtered_boxes = []
-        filtered_confidences = []
-        filtered_classes = []
+        """Filter boxes based on class confidence threshold"""
+        filtered_boxes_list = []
+        filtered_classes_list = []
+        filtered_scores_list = []
 
-        # Iterate through each scale's predictions
-        for box, confidence, class_prob in zip(boxes, box_confidences, box_class_probs):
-            # Compute class-specific confidence
-            class_scores = confidence * class_prob
-        
-            # Find indices where max class score is above threshold
-            mask = class_scores.max(axis=-1) >= self.class_t
-        
-            # Apply mask to boxes and scores
-            filtered_scale_boxes = box[mask]
-            filtered_scale_confidences = confidence[mask]
-            filtered_scale_classes = class_prob[mask]
-        
-            filtered_boxes.append(filtered_scale_boxes)
-            filtered_confidences.append(filtered_scale_confidences)
-            filtered_classes.append(filtered_scale_classes)
+        for output_boxes, output_confidences, output_class_probs in zip(boxes, box_confidences, box_class_probs):
+            # Reshape and flatten the inputs
+            box_count = output_boxes.shape[0] * output_boxes.shape[1] * output_boxes.shape[2]
+            boxes_flat = output_boxes.reshape(box_count, 4)
+            confidences_flat = output_confidences.reshape(box_count)
+            class_probs_flat = output_class_probs.reshape(box_count, -1)
 
-        return filtered_boxes, filtered_confidences, filtered_classes
+            # Compute box scores
+            box_scores = confidences_flat * np.max(class_probs_flat, axis=1)
+
+            # Find indices of boxes above threshold
+            mask = box_scores >= self.class_t
+
+            # Get filtered boxes, classes, and scores
+            filtered_boxes = boxes_flat[mask]
+            filtered_classes = np.argmax(class_probs_flat[mask], axis=1)
+            filtered_scores = box_scores[mask]
+
+            filtered_boxes_list.append(filtered_boxes)
+            filtered_classes_list.append(filtered_classes)
+            filtered_scores_list.append(filtered_scores)
+
+        # Combine results from all scales
+        filtered_boxes = np.concatenate(filtered_boxes_list)
+        box_classes = np.concatenate(filtered_classes_list)
+        box_scores = np.concatenate(filtered_scores_list)
+
+        return filtered_boxes, box_classes, box_scores
