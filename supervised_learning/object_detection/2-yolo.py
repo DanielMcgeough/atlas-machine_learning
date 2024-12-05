@@ -77,6 +77,7 @@ class Yolo:
             box_class_probs.append(box_class_prob)
 
         return boxes, box_confidences, box_class_probs
+
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
         """Filters boxes and returns filtered boxes, classes, and scores.
 
@@ -92,17 +93,3 @@ class Yolo:
         all_boxes = np.concatenate([a.reshape(-1, 4) for a in boxes], axis=0)
         all_scores = np.concatenate([a.reshape(-1) for a in box_confidences], axis=0)
         all_classes = np.argmax(np.concatenate([a.reshape(-1, -1) for a in box_class_probs], axis=0), axis=1)
-
-        # Apply class probability threshold
-        indices = np.where(all_scores > self.class_t)[0]
-        all_boxes = all_boxes[indices]
-        all_scores = all_scores[indices]
-        all_classes = all_classes[indices]
-
-        # Apply NMS
-        nms_indices = self.non_max_suppression(all_boxes, all_scores, self.nms_t)
-        filtered_boxes = all_boxes[nms_indices]
-        box_classes = all_classes[nms_indices]
-        box_scores = all_scores[nms_indices]
-
-        return filtered_boxes, box_classes, box_scores
