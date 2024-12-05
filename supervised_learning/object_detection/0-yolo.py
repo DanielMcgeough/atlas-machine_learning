@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
-"""Module defines the class Yolo v3
-This is the cornerstone of Object Detection
-YOLO is supposed to strike a balance
-between speed and accuracy"""
+""" Module defines the lass Yolo """
 from tensorflow import keras as K
-
-
-def load_class_names(filepath):
-    """Load the class"""
-    with open(filepath, "r") as file:
-        class_names = file.readlines()
-    return [name.strip() for name in class_names]
 
 
 class Yolo:
@@ -22,9 +12,12 @@ class Yolo:
     cars"""
 
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """initialization of yolo"""
+        """
+        initializes Yolo class.
+        """
         self.model = K.models.load_model(model_path)
-        self.class_names = load_class_names(classes_path)
+        with open(classes_path, 'r') as f:
+            self.class_names = [line.strip() for line in f]
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
