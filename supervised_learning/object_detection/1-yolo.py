@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """Module defines the class Yolo v3
 This is the cornerstone of Object Detection
@@ -6,66 +7,85 @@ between speed and accuracy"""
 from tensorflow import keras as K
 import numpy as np
 
+
+def load_class_names(filepath):
+    """Load the class"""
+    with open(filepath, "r") as file:
+        class_names = file.readlines()
+    return [name.strip() for name in class_names]
+
+
 class Yolo:
-    """ Class initiliazes the Yolo v3 algorithm to perform object detection
-    It accomplish this by addressing certain things needed
-    to establish bounding boxes and other aspects of
-    image detection with localization"""
+    """Class for YOLO that is an
+    object detection system that
+    has a balance between speed
+    and accuracy it is popular in
+    applications like self driving
+    cars"""
 
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """
-        Class constructor
-        Arguments:
-            model_path (str): path to where Darknet Keras model is stored.
-            Darknet model is considered a good set for object detection.
-            It is also a good tool to use when localization is needed.
-            classes_path (str): path to list of class names in order of index
-                used for the model. All 80 of them which is making me
-                concernicus.
-
-            class_t (float): box score threshold to filter boxes by
-
-            nms_t (float): IOU threshold for non-max suppression
-
-            anchors (numpy.ndarray): array of shape (outputs, anchor_boxes, 2)
-                containing all anchor boxes:
-                    outputs: number of outputs (predictions) made
-                    anchor_boxes: number of anchor boxes for each prediction
-                    2: [anchor_box_width, anchor_box_height]
-
-        """
+        """initialization of yolo"""
         self.model = K.models.load_model(model_path)
-        with open(classes_path, 'r') as f:
-            self.class_names = [line.strip() for line in f]
+        self.class_names = load_class_names(classes_path)
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
+def sigmoid(self, x):
+        """Makes a sigmoid to return
+        Idk if I'll need it"""
+        return 1 / (1 + np.exp(-x))
 
 def process_outputs(self, outputs, image_size):
-        boxes, box_confidences, box_class_probs = [], [], []
-        image_height, image_width = image_size
+        """Processes the outputs"""
+        boxes = [output[..., :4] for output in outputs]
+        box_confidences = []
+        box_class_probs = []
 
-        for idx, outpout in enumerate(outputs):
-            grid_height, grid_width, anchor+boxes, _ = output.shape
+        image_height = image_size[0]
+        image_width = image_size[1]
 
-            cx = np.arange(grid_width).reshape(1, grid_width, 1)
-            cy = np.arange(grid_height).reshape(grid_height, 1, 1)
+        input_layer = self.model.input
+        input_width, input_height = input_layer.shape[1:3]
 
-            bx = output[..., 0]
-            by = output[..., 1]
-            bw = output[..., 2]
-            bh = output[..., 3]
+        for i, output in enumerate(outputs):
 
-            bx = (1 / (1 + np.exp(-bx)) + cx) / grid_width
-            by = (1 / (1 + np.exp(-by)) + cy) / grid_height
+            box = output
+            box_x = box[..., 0]
+            box_y = box[..., 1]
+            box_w = box[..., 2]
+            box_h = box[..., 3]
 
-            pw = self.anchors[idx, :, 0]
-            ph = self.anchors[idx, :, 1]
+            box_confidence = self.sigmoid(output[..., 4:5])
+            box_class_prob = self.sigmoid(output[..., 5:])
 
-            bw = pw * np.exp(bw) / self.model.input.shape[1]
-            bh = ph * np.exp(bh) / self.model.input.shape[2]
+            box_confidences.append(box_confidence)
+            box_class_probs.append(box_class_prob)
 
-            x1 = (bx - bw / 2) * image_width
-            y1 = (by - bh / 2) * image_height
-            x2 = (bx + bw / 2) * image_width
-            y2 = (by + bh / 2) * image_height
+            grid_height = box.shape[0]
+            grid_width = box.shape[1]
+            num_anchors = output.shape[2]
+
+            center_x = np.arange(grid_width).reshape(1, grid_width)
+            center_x = np.repeat(center_x, grid_height, axis=0)
+
+            center_y = np.arange(grid_width).reshape(1, grid_width)
+            center_y = np.repeat(center_y, grid_height, axis=0).T
+
+            center_x = np.repeat(center_x[..., np.newaxis],
+                                 num_anchors, axis=2)
+            center_y = np.repeat(center_y[..., np.newaxis],
+                                 num_anchors, axis=2)
+
+            pred_x = (self.sigmoid(box_x) + center_x) / grid_width
+            pred_y = (self.sigmoid(box_y) + center_y) / grid_height
+            pred_w = (np.exp(box_w) * self.anchors[i, :, 0]) / input_width
+            pred_h = (np.exp(box_h) * self.anchors[i, :, 1]) / input_height
+
+            boxes[i][..., 0] = (pred_x - (pred_w / 2)) * image_width
+            boxes[i][..., 1] = (pred_y - (pred_h / 2)) * image_height
+            boxes[i][..., 2] = (pred_x + (pred_w / 2)) * image_width
+            boxes[i][..., 3] = (pred_y + (pred_h / 2)) * image_height
+
+            # boxes.append(box)
+
+        return boxes, box_confidences, box_class_probs
