@@ -86,6 +86,6 @@ def process_outputs(self, outputs, image_size):
             boxes[i][..., 2] = (pred_x + (pred_w / 2)) * image_width
             boxes[i][..., 3] = (pred_y + (pred_h / 2)) * image_height
 
-            # boxes.append(box)
+            boxes.append(box)
 
         return boxes, box_confidences, box_class_probs
