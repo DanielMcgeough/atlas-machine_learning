@@ -200,43 +200,34 @@ class Yolo:
 
         return images, image_paths
 
-def preprocess_images(self, images):
-    """
-    Preprocess a list of images for YOLO object detection.
+    def preprocess_images(self, images):
+        """
+        Preprocess a list of images for YOLO object detection.
     
-    Args:
-        images (list): A list of numpy.ndarray images
+        Args:
+            images (list): A list of numpy.ndarray images
     
-    Returns:
-        tuple: A tuple containing:
-            - pimages (numpy.ndarray): Preprocessed images 
-            - image_shapes (numpy.ndarray): Original image dimensions
-    """
-    # Get input dimensions from the model
-    input_h = self.model.input.shape[1]
-    input_w = self.model.input.shape[2]
-    
-    # Initialize arrays to store preprocessed images and original shapes
-    pimages = []
-    image_shapes = []
-    
-    for image in images:
-        # Store original image shape
-        original_h, original_w = image.shape[:2]
-        image_shapes.append([original_h, original_w])
-        
-        # Resize image using inter-cubic interpolation
-        resized_image = cv2.resize(image, 
-                                   (input_w, input_h), 
-                                   interpolation=cv2.INTER_CUBIC)
-        
-        # Normalize pixel values to range [0, 1]
-        normalized_image = resized_image.astype(np.float32) / 255.0
-        
-        pimages.append(normalized_image)
-    
-    # Convert lists to numpy arrays
-    pimages = np.array(pimages)
-    image_shapes = np.array(image_shapes)
-    
-    return pimages, image_shapes
+        Returns:
+            tuple: A tuple containing:
+                - pimages (numpy.ndarray): Preprocessed images 
+                - image_shapes (numpy.ndarray): Original image dimensions
+        """
+
+        # Initialize arrays to store preprocessed images and original shapes
+        pimages = []
+        image_shapes = []
+
+        # Pull input dimensions for resize
+        input_w, input_h = self.model.input.shape[1:3]
+
+        for img in images:
+            image_shapes.append((img.shape[0], img.shape[1]))
+            resized = cv2.resize(img, (input_w, input_h),
+                                 interpolation=cv2.INTER_CUBIC)
+            pimages = resized / 255.0
+            pimages.append(pimg)
+
+        # Reshape for expected dimensions
+        pimages = np.array(pimgs).reshape(-1, input_h, input_w, 3)
+
+        return pimages, np.array(image_shapes)
