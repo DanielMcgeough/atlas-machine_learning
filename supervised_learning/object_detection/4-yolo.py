@@ -193,29 +193,11 @@ class Yolo:
         images = []
         image_paths = []
 
-        # Verify folder exists
-        if not os.path.exists(folder_path):
-            return images, image_paths
-
-        # Iterate through files in the folder
         for filename in os.listdir(folder_path):
-            # Full path to the image
-            file_path = os.path.join(folder_path, filename)
-
-            # Check if it's an image file
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
-                try:
-                    # Read image using OpenCV
-                    img = cv2.imread(file_path)
-                
-                    # Convert from BGR to RGB (OpenCV reads in BGR)
-                    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                
-                    # Only add if image is not None
-                    if img is not None:
-                        images.append(img)
-                        image_paths.append(file_path)
-                except Exception as e:
-                    print(f"Error loading image {file_path}: {e}")
+            if filename.endswith(('.jpg', '.jpeg', '.png')):
+                image_path = os.path.join(folder_path, filename)
+                image = cv2.imread(image_path)
+                images.append(image)
+                image_paths.append(image_path)
 
         return images, image_paths
