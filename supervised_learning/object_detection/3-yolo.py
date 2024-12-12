@@ -118,3 +118,85 @@ class Yolo:
         box_scores = np.concatenate(filtered_scores_list)
 
         return filtered_boxes, box_classes, box_scores
+
+    def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
+        """Perform non-maximum suppression on filtered boxes"""
+        # Get unique classes
+        unique_classes = np.unique(box_classes)
+
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
+
+        for cls in unique_classes:
+            # Find indices of boxes for current class
+            class_indices = np.where(box_classes == cls)[0]
+            class_boxes = filtered_boxes[class_indices]
+            class_scores = box_scores[class_indices]
+
+            # Sort boxes by score in descending order
+            sorted_indices = np.argsort(-class_scores)
+            class_boxes = class_boxes[sorted_indices]
+            class_scores = class_scores[sorted_indices]
+
+            # Store selected boxes
+            selected_boxes = []
+            selected_scores = []
+
+            while len(class_boxes) > 0:
+                # Keep the box with highest score
+                best_box = class_boxes[0]
+                best_score = class_scores[0]
+                selected_boxes.append(best_box)
+                selected_scores.append(best_score)
+
+                # Remove the best box from the list
+                class_boxes = class_boxes[1:]
+                class_scores = class_scores[1:]
+
+                # If no more boxes, break
+                if len(class_boxes) == 0:
+                    break
+
+                # Compute IoU (Intersection over Union)
+                ious = calculate_iou(best_box, class_boxes)
+
+                # Remove boxes with IoU above threshold
+                mask = ious <= self.nms_t
+                class_boxes = class_boxes[mask]
+                class_scores = class_scores[mask]
+
+            # Add selected boxes for this class
+            box_predictions.extend(selected_boxes)
+            predicted_box_classes.extend([cls] * len(selected_boxes))
+            predicted_box_scores.extend(selected_scores)
+
+        # Convert to numpy arrays
+        box_predictions = np.array(box_predictions)
+        predicted_box_classes = np.array(predicted_box_classes)
+        predicted_box_scores = np.array(predicted_box_scores)
+
+        return box_predictions, predicted_box_classes, predicted_box_scores
+
+    def calculate_iou(box, boxes):
+        """Calculate Intersection over Union"""
+        # Compute coordinates of intersection rectangle
+        x1 = np.maximum(box[0], boxes[:, 0])
+        y1 = np.maximum(box[1], boxes[:, 1])
+        x2 = np.minimum(box[2], boxes[:, 2])
+        y2 = np.minimum(box[3], boxes[:, 3])
+
+        # Compute area of intersection
+        intersection = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
+
+        # Compute area of both boxes
+        box_area = (box[2] - box[0]) * (box[3] - box[1])
+        boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+
+        # Compute union
+        union = box_area + boxes_area - intersection
+
+        # Compute IoU
+        iou = intersection / union
+
+        return iou
