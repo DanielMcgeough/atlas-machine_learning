@@ -184,30 +184,38 @@ class Yolo:
 
         return box_predictions, predicted_box_classes, predicted_box_scores
 
-    def preprocess_images(self, images):
-        """Preprocess images for YOLO model input"""
-        # Get input shape from the model
-        input_h = self.model.input.shape[1]
-        input_w = self.model.input.shape[2]
+    def load_images(folder_path):
+        """Load images from a specified folder"""
+        import os
+        import cv2
 
-        # Store original image shapes
-        image_shapes = np.array([img.shape[:2] for img in images])
+        # List to store images and their paths
+        images = []
+        image_paths = []
 
-        # Preprocess images
-        pimages = []
-        for img in images:
-            # Resize image using inter-cubic interpolation
-            resized_img = K.preprocessing.image.smart_resize(
-                img, (input_h, input_w), 
-                interpolation='bicubic'
-            )
-        
-            # Rescale pixel values to [0, 1]
-            normalized_img = resized_img / 255.0
-        
-            pimages.append(normalized_img)
+        # Verify folder exists
+        if not os.path.exists(folder_path):
+            return images, image_paths
 
-        # Convert to numpy array
-        pimages = np.array(pimages)
+        # Iterate through files in the folder
+        for filename in os.listdir(folder_path):
+            # Full path to the image
+            file_path = os.path.join(folder_path, filename)
 
-        return pimages, image_shapes
+            # Check if it's an image file
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
+                try:
+                    # Read image using OpenCV
+                    img = cv2.imread(file_path)
+                
+                    # Convert from BGR to RGB (OpenCV reads in BGR)
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                
+                    # Only add if image is not None
+                    if img is not None:
+                        images.append(img)
+                        image_paths.append(file_path)
+                except Exception as e:
+                    print(f"Error loading image {file_path}: {e}")
+
+        return images, image_paths
