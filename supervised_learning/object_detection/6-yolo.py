@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Module defines the class Yolo """
+
 from tensorflow import keras as K
 import numpy as np
 import os
