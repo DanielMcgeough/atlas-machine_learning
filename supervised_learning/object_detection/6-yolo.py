@@ -265,7 +265,7 @@ class Yolo:
 
             # Get text size for positioning
             (text_width, text_height), _ = cv2.getTextSize(
-                text, 
+                label, 
                 cv2.FONT_HERSHEY_SIMPLEX, 
                 0.5,  # Font scale
                 1     # Line thickness
