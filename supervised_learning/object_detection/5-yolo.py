@@ -209,12 +209,11 @@ class Yolo:
     
         Returns:
             tuple: A tuple containing:
-                - pimages (numpy.ndarray): Preprocessed images 
+                - pimgs (numpy.ndarray): Preprocessed images 
                 - image_shapes (numpy.ndarray): Original image dimensions
         """
 
-        # Initialize arrays to store preprocessed images and original shapes
-        pimages = []
+        pimgs = []
         image_shapes = []
 
         # Pull input dimensions for resize
@@ -224,10 +223,10 @@ class Yolo:
             image_shapes.append((img.shape[0], img.shape[1]))
             resized = cv2.resize(img, (input_w, input_h),
                                  interpolation=cv2.INTER_CUBIC)
-            pimages = resized / 255.0
-            pimages.append(pimg)
+            pimg = resized / 255.0
+            pimgs.append(pimg)
 
         # Reshape for expected dimensions
-        pimages = np.array(pimgs).reshape(-1, input_h, input_w, 3)
+        pimgs = np.array(pimgs).reshape(-1, input_h, input_w, 3)
 
-        return pimages, np.array(image_shapes)
+        return pimgs, np.array(image_shapes)
