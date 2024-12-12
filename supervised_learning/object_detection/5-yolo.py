@@ -203,13 +203,13 @@ class Yolo:
     def preprocess_images(self, images):
         """
         Preprocess a list of images for YOLO object detection.
-    
+
         Args:
             images (list): A list of numpy.ndarray images
-    
+
         Returns:
             tuple: A tuple containing:
-                - pimgs (numpy.ndarray): Preprocessed images 
+                - pimgs (numpy.ndarray): Preprocessed images
                 - image_shapes (numpy.ndarray): Original image dimensions
         """
 
