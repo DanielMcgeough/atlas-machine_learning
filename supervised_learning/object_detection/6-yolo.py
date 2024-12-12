@@ -250,7 +250,7 @@ class Yolo:
             x1, y1, x2, y2 = box.astype(int)
 
             # Get class name and score
-            class_name = self.class_names[box_classes[i]]
+            cls = self.class_names[box_classes[i]]
             score = box_scores[i]
 
             # Draw bounding box (blue, thickness 2)
@@ -261,7 +261,7 @@ class Yolo:
                         2)  # Thickness
 
             # Prepare text (class name + score)
-            text = f"{class_name} {score:.2f}"
+            label = f'{self.class_names[cls]} {score:.2f}'
 
             # Get text size for positioning
             (text_width, text_height), _ = cv2.getTextSize(
@@ -277,7 +277,7 @@ class Yolo:
 
             # Draw text (red color)
             cv2.putText(img_copy, 
-                        text, 
+                        label, 
                         (text_x, text_y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         0.5,        # Font scale
