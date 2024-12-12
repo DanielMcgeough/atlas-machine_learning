@@ -2,6 +2,8 @@
 """ Module defines the class Yolo """
 from tensorflow import keras as K
 import numpy as np
+import os
+import cv2
 
 
 class Yolo:
@@ -186,8 +188,6 @@ class Yolo:
 
     def load_images(folder_path):
         """Load images from a specified folder"""
-        import os
-        import cv2
 
         # List to store images and their paths
         images = []
