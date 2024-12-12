@@ -177,26 +177,3 @@ class Yolo:
         predicted_box_scores = np.array(predicted_box_scores)
 
         return box_predictions, predicted_box_classes, predicted_box_scores
-
-    def calculate_iou(box, boxes):
-        """Calculate Intersection over Union"""
-        # Compute coordinates of intersection rectangle
-        x1 = np.maximum(box[0], boxes[:, 0])
-        y1 = np.maximum(box[1], boxes[:, 1])
-        x2 = np.minimum(box[2], boxes[:, 2])
-        y2 = np.minimum(box[3], boxes[:, 3])
-
-        # Compute area of intersection
-        intersection = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
-
-        # Compute area of both boxes
-        box_area = (box[2] - box[0]) * (box[3] - box[1])
-        boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-
-        # Compute union
-        union = box_area + boxes_area - intersection
-
-        # Compute IoU
-        iou = intersection / union
-
-        return iou
