@@ -120,58 +120,64 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """Perform non-maximum suppression on filtered boxes"""
-        # Get unique classes
-        unique_classes = np.unique(box_classes)
-
+        """Applies non-max suppression to filtered boxes"""
         box_predictions = []
         predicted_box_classes = []
         predicted_box_scores = []
 
+        # Get unique classes
+        unique_classes = np.unique(box_classes)
+
         for cls in unique_classes:
-            # Find indices of boxes for current class
-            class_indices = np.where(box_classes == cls)[0]
-            class_boxes = filtered_boxes[class_indices]
-            class_scores = box_scores[class_indices]
+            # Get indices of boxes for current class
+            indices = np.where(box_classes == cls)[0]
 
-            # Sort boxes by score in descending order
-            sorted_indices = np.argsort(-class_scores)
-            class_boxes = class_boxes[sorted_indices]
-            class_scores = class_scores[sorted_indices]
+            # Get boxes and scores for current class
+            class_boxes = filtered_boxes[indices]
+            class_scores = box_scores[indices]
 
-            # Store selected boxes
-            selected_boxes = []
-            selected_scores = []
+            # Sort by score in descending order
+            score_sort = np.argsort(-class_scores)
+            class_boxes = class_boxes[score_sort]
+            class_scores = class_scores[score_sort]
 
             while len(class_boxes) > 0:
-                # Keep the box with highest score
-                best_box = class_boxes[0]
-                best_score = class_scores[0]
-                selected_boxes.append(best_box)
-                selected_scores.append(best_score)
+                # Take the box with highest score
+                box_predictions.append(class_boxes[0])
+                predicted_box_classes.append(cls)
+                predicted_box_scores.append(class_scores[0])
 
-                # Remove the best box from the list
-                class_boxes = class_boxes[1:]
-                class_scores = class_scores[1:]
-
-                # If no more boxes, break
-                if len(class_boxes) == 0:
+                if len(class_boxes) == 1:
                     break
 
-                # Compute IoU (Intersection over Union)
-                ious = calculate_iou(best_box, class_boxes)
+                # Compare with rest of the boxes
+                box = class_boxes[0]
 
-                # Remove boxes with IoU above threshold
-                mask = ious <= self.nms_t
-                class_boxes = class_boxes[mask]
-                class_scores = class_scores[mask]
+                # Calculate coordinates of intersection
+                x1 = np.maximum(box[0], class_boxes[1:, 0])
+                y1 = np.maximum(box[1], class_boxes[1:, 1])
+                x2 = np.minimum(box[2], class_boxes[1:, 2])
+                y2 = np.minimum(box[3], class_boxes[1:, 3])
 
-            # Add selected boxes for this class
-            box_predictions.extend(selected_boxes)
-            predicted_box_classes.extend([cls] * len(selected_boxes))
-            predicted_box_scores.extend(selected_scores)
+                # Calculate intersection area
+                intersection_area = np.maximum(0, x2 - x1) * \
+                    np.maximum(0, y2 - y1)
 
-        # Convert to numpy arrays
+                # Calculate union area
+                box_area = (box[2] - box[0]) * (box[3] - box[1])
+                class_boxes_area = (class_boxes[1:, 2] - class_boxes[1:, 0]) *\
+                    (class_boxes[1:, 3] - class_boxes[1:, 1])
+                union_area = box_area + class_boxes_area - intersection_area
+
+                # Calculate IoU
+                iou = intersection_area / union_area
+
+                # Keep boxes with IoU less than threshold
+                keep_indices = np.where(iou < self.nms_t)[0]
+                class_boxes = class_boxes[keep_indices + 1]
+                class_scores = class_scores[keep_indices + 1]
+
+        # Convert results to numpy arrays
         box_predictions = np.array(box_predictions)
         predicted_box_classes = np.array(predicted_box_classes)
         predicted_box_scores = np.array(predicted_box_scores)
