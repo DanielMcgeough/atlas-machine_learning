@@ -2,3 +2,5 @@
 *.h5
 # Pictures
 *.jpg
+# pycaches
+*.pyc
