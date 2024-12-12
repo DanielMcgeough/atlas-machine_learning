@@ -187,7 +187,19 @@ class Yolo:
         return box_predictions, predicted_box_classes, predicted_box_scores
 
     def load_images(self, folder_path):
-        """Loads images from a folder"""
+        """
+        Loads images from a folder
+
+        Arguments:
+            folder_path (str): path to the folder containing the images
+
+        Returns:
+            tuple containing:
+                images (list):
+                    list of images as numpy arrays
+                image_paths (list):
+                    list of paths to the images
+        """
         images = []
         image_paths = []
 
