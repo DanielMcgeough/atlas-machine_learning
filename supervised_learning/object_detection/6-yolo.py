@@ -230,3 +230,76 @@ class Yolo:
         pimgs = np.array(pimgs).reshape(-1, input_h, input_w, 3)
 
         return pimgs, np.array(image_shapes)
+
+    def show_boxes(self, image, boxes, box_classes, box_scores, file_name):
+        """
+        Display image with bounding boxes, class names, and scores.
+        Args:
+            image (numpy.ndarray): Unprocessed input image
+            boxes (numpy.ndarray): Boundary boxes for the image
+            box_classes (numpy.ndarray): Class indices for each box
+            box_scores (numpy.ndarray): Scores for each box
+            file_name (str): File path of the original image
+        """
+        # Create a copy of the image to draw on
+        img_copy = image.copy()
+
+        # Iterate through each box
+        for i, box in enumerate(boxes):
+            # Extract box coordinates
+            x1, y1, x2, y2 = box.astype(int)
+
+            # Get class name and score
+            class_name = self.class_names[box_classes[i]]
+            score = box_scores[i]
+
+            # Draw bounding box (blue, thickness 2)
+            cv2.rectangle(img_copy, 
+                        (x1, y1), 
+                        (x2, y2), 
+                        (255, 0, 0),  # Blue color in BGR 
+                        2)  # Thickness
+
+            # Prepare text (class name + score)
+            text = f"{class_name} {score:.2f}"
+
+            # Get text size for positioning
+            (text_width, text_height), _ = cv2.getTextSize(
+                text, 
+                cv2.FONT_HERSHEY_SIMPLEX, 
+                0.5,  # Font scale
+                1     # Line thickness
+            )
+
+            # Position text 5 pixels above the box top-left corner
+            text_x = x1
+            text_y = y1 - 5
+
+            # Draw text (red color)
+            cv2.putText(img_copy, 
+                        text, 
+                        (text_x, text_y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        0.5,        # Font scale
+                        (0, 0, 255),# Red color in BGR
+                        1,          # Line thickness
+                        cv2.LINE_AA # Line type
+                        )
+
+        # Display the image
+        cv2.imshow(file_name, img_copy)
+
+        # Wait for key press
+        key = cv2.waitKey(0)
+
+        # Check if 's' key is pressed
+        if key == ord('s'):
+            # Create detections directory if it doesn't exist
+            os.makedirs('detections', exist_ok=True)
+
+            # Save the image
+            save_path = os.path.join('detections', os.path.basename(file_name))
+            cv2.imwrite(save_path, img_copy)
+
+        # Close all windows
+        cv2.destroyAllWindows()
