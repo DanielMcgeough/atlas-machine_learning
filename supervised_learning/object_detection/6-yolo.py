@@ -241,53 +241,24 @@ class Yolo:
             box_scores (numpy.ndarray): Scores for each box
             file_name (str): File path of the original image
         """
-        # Create a copy of the image to draw on
-        img_copy = image.copy()
-
-        # Iterate through each box
-        for i, box in enumerate(boxes):
-            # Extract box coordinates
-            x1, y1, x2, y2 = box.astype(int)
-
-            # Get class name and score
-            cls = self.class_names[box_classes[i]]
-            score = box_scores[i]
-
-            # Draw bounding box (blue, thickness 2)
-            cv2.rectangle(img_copy, 
-                        (x1, y1), 
-                        (x2, y2), 
-                        (255, 0, 0),  # Blue color in BGR 
-                        2)  # Thickness
-
-            # Prepare text (class name + score)
+        # Draw boxes and labels on the image
+        for box, cls, score in zip(boxes, box_classes, box_scores):
+            # Typecast coordinates to int
+            x1, y1, x2, y2 = map(lambda x: int(round(x)), box)
+            # Draw blue bounding box
+            cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+            # Red label text
             label = f'{self.class_names[cls]} {score:.2f}'
-
-            # Get text size for positioning
-            (text_width, text_height), _ = cv2.getTextSize(
-                label, 
-                cv2.FONT_HERSHEY_SIMPLEX, 
-                0.5,  # Font scale
-                1     # Line thickness
-            )
-
-            # Position text 5 pixels above the box top-left corner
-            text_x = x1
-            text_y = y1 - 5
-
-            # Draw text (red color)
-            cv2.putText(img_copy, 
-                        label, 
-                        (text_x, text_y), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 
-                        0.5,        # Font scale
-                        (0, 0, 255),# Red color in BGR
-                        1,          # Line thickness
-                        cv2.LINE_AA # Line type
-                        )
+            cv2.putText(image, label,
+                        (x1, y1 - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (0, 0, 255),
+                        1,
+                        cv2.LINE_AA)
 
         # Display the image
-        cv2.imshow(file_name, img_copy)
+        cv2.imshow(file_name, image)
 
         # Wait for key press
         key = cv2.waitKey(0)
@@ -299,7 +270,7 @@ class Yolo:
 
             # Save the image
             save_path = os.path.join('detections', os.path.basename(file_name))
-            cv2.imwrite(save_path, img_copy)
+            cv2.imwrite(save_path, image)
 
         # Close all windows
         cv2.destroyAllWindows()
