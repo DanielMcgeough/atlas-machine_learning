@@ -6,7 +6,7 @@ def determinant(matrix):
     """Get the determinant of a matrix
      a useful number associated with a
      square matrix that tells you important
-     things about the matrix, like 
+     things about the matrix, like
      it's invertible and how it affects
      volumes under linear transformations."""
 
@@ -27,7 +27,7 @@ def determinant(matrix):
     if n == 2:
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
-    #calculating the cofactor
+    # calculating the cofactor
     cof = 0
     for j in range(n):
         minor = [[matrix[i][k] for k in range(n) if k != j]
