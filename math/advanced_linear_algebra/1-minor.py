@@ -13,7 +13,7 @@ def minor(matrix):
 
     n = len(matrix)
     if not all(len(row) == n for row in matrix) or matrix == [[]]:
-        raise ValueError("matrix must be a square matrix")
+        raise ValueError("matrix must be a non-empty square matrix")
 
     new_matrix = [[0 for _ in range(n)] for _ in range(n)]
 
