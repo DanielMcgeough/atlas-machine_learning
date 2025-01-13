@@ -19,7 +19,7 @@ def determinant(matrix):
 
     n = len(matrix)
     if not all(len(row) == n for row in matrix):
-        raise ValueError("matrix must be a square matrix")
+        raise ValueError("matrix must be a non-empty square matrix")
 
     if n == 1:
         return matrix[0][0]
