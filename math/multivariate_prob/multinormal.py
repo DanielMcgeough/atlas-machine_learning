@@ -37,4 +37,5 @@ class MultiNormal:
         # Calculate covariance matrix
         # For shape (d, n), formula is:
         # (1/(n-1)) * centered_data @ centered_data.T
-        self.cov = np.matmul(centered_data, centered_data.T) / (n - 1)  # shape (d, d)
+        self.cov = np.matmul(centered_data, centered_data.T) / (n - 1)
+        # shape (d, d)
