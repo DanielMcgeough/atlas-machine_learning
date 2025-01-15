@@ -9,10 +9,13 @@ class MultiNormal:
     """
     def __init__(self, data):
         """
-        Initialize the MultiNormal distribution with a dataset
+        Initialize the MultiNormal distribution
+        with a dataset
 
         Parameters:
-            data: numpy.ndarray of shape (d, n) containing n d-dimensional data points
+            data: numpy.ndarray of shape
+            (d, n) containing n d-dimensional
+            data points
         """
         # Check if data is a 2D numpy array
         if not isinstance(data, np.ndarray) or len(data.shape) != 2:
@@ -32,5 +35,6 @@ class MultiNormal:
         centered_data = data - self.mean
 
         # Calculate covariance matrix
-        # For shape (d, n), formula is: (1/(n-1)) * centered_data @ centered_data.T
+        # For shape (d, n), formula is:
+        # (1/(n-1)) * centered_data @ centered_data.T
         self.cov = np.matmul(centered_data, centered_data.T) / (n - 1)  # shape (d, d)
