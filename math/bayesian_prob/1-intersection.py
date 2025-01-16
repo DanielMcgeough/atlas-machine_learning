@@ -52,6 +52,7 @@ def intersection(x, n, P, Pr):
     # Calculate intersection = likelihood * prior
     return likelihood(x, n, P) * Pr
 
+
 def likelihood(x, n, P):
     """
     Calculate likelihood of observing x
