@@ -5,7 +5,7 @@ import numpy as np
 
 def marginal(x, n, P, Pr):
     """Calculate marginal probability of obtaining the data
-   
+
    Parameters:
        x: number of successes (patients with side effects)
        n: number of trials (total patients)
