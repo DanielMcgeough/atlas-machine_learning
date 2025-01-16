@@ -23,7 +23,9 @@ def likelihood(x, n, P):
 
     # Check if x is a non-negative integer
     if not isinstance(x, (int, np.integer)) or x < 0:
-        raise ValueError("x must be an integer that is greater than or equal to 0")
+        raise ValueError(
+            "x must be an integer that is greater than or equal to 0"
+            )
 
     # Check if x is less than or equal to n
     if x > n:
