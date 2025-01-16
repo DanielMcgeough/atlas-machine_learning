@@ -44,7 +44,7 @@ def likelihood(x, n, P):
 
     # Calculate binomial coefficient C(n,x)
     coef = np.math.factorial(n) / (np.math.factorial(x) *
-                                np.math.factorial(n - x))
+        np.math.factorial(n - x))
 
     # Calculate p^x and (1-p)^(n-x) for each p in P
     # Then multiply by coefficient
