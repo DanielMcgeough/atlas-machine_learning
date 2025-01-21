@@ -8,10 +8,13 @@ def pca(X, var=0.95):
     Performs Principal Component Analysis (PCA) on dataset X using SVD.
 
     Parameters:
-        X (numpy.ndarray): Array of shape (n, d) where n is number of data points
-                          and d is number of dimensions. All dimensions should have
-                          mean of 0 across data points.
-        var (float): Fraction of variance to maintain (default: 0.95)
+        X (numpy.ndarray): Array of shape
+        (n, d) where n is number of data points
+        and d is number of dimensions.
+        All dimensions should have
+        mean of 0 across data points.
+        var (float): Fraction of variance to
+        maintain (default: 0.95)
 
     Returns:
         numpy.ndarray: Weights matrix W of shape (d, nd) where nd is the new
