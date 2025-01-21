@@ -17,11 +17,8 @@ def pca(X, var=0.95):
         numpy.ndarray: Weights matrix W of shape (d, nd) where nd is the new
                       dimensionality that maintains var fraction of variance
     """
-    # Perform SVD
-    # U: left singular vectors (n x n)
-    # S: singular values (min(n,d))
-    # Vh: right singular vectors (d x d)
-    U, S, Vh = np.linalg.svd(X, full_matrices=False)
+    # SVD decomposition
+    _, s, Vh = np.linalg.svd(X, full_matrices=False)
 
     # Calculate explained variance ratio
     explained_variance = (s ** 2) / np.sum(s ** 2)
@@ -31,6 +28,5 @@ def pca(X, var=0.95):
 
     # get number of components
     n_components = 1 + np.where(cumulative_variance >= var)[0][0] + 1
-    W = Vh.T[:, :n_components]
-    
-    return W
+
+    return Vh.T[:, :n_components]
