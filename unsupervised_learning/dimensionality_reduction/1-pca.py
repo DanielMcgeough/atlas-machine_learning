@@ -5,7 +5,9 @@ import numpy as np
 
 def pca(X, ndim):
     """
-    Performs Principal Component Analysis (PCA) on dataset X and returns transformed data.
+    Performs Principal Component Analysis
+    (PCA) on dataset X and returns
+    transformed data.
 
     Parameters:
         X (numpy.ndarray): Array of shape
@@ -24,8 +26,11 @@ def pca(X, ndim):
     # Perform SVD
     U, S, Vh = np.linalg.svd(X_centered, full_matrices=False)
 
-    # Project the centered data onto the principal components
-    # We can do this by multiplying X_centered with the first ndim right singular vectors
+    # Project the centered data onto the
+    # principal components
+    # We can do this by multiplying
+    # X_centered with the first ndim right
+    # singular vectors
     T = np.dot(X_centered, Vh.T[:, :ndim])
 
     return T
