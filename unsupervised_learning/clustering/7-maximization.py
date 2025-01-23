@@ -25,44 +25,37 @@ def maximization(X, g, verbose=False):
         S is a numpy.ndarray of shape
         (k, d, d) containing the updated
         covariance matrices for each cluster"""
-    if verbose:
-        print(f'{X}, {g}')
-    if not isinstance(g, np.ndarray) or len(g.shape) != 2:
+    if (not isinstance(X, np.ndarray) or len(X.shape) != 2 or
+            not isinstance(g, np.ndarray) or len(g.shape) != 2):
         return None, None, None
-    
-    try:
 
-        # Num of clusters and data points
-        k, n = g.shape
-        d = X.shape[1]
-
-        # Calculate cluster responsibilities (sum of posterior probs)
-        resp = np.sum(g, axis=1)
-
-
-        if np.any(resp == 0):
-            if verbose:
-                print('if resp is 0')
-            return None, None, None
-            
-        # Prior probs (weight/cluster)
-        pi = resp / n
-
-        # Calculate cluster means
-        m = np.dot(g, X) / resp[:, np.newaxis]
-
-        # Calculate covariance matrices
-        S = np.zeros((k, d, d))
-        for j in range(k):
-            # subract mean from cada data point
-            X_centered = X - m[j]
-
-            # weighted covariance calc
-            S[j] = np.dot(g[j] * X_centered.T, X_centered) / resp[j]
-        
-        if verbose:
-            print(f'{pi}, {m}, {S}')
-        return pi, m, S
-
-    except Exception:
+    n, d = X.shape
+    k, n_2 = g.shape
+    if n != n_2:
         return None, None, None
+
+    # Check that each data point's posterior probabilities sum to 1
+    if not np.allclose(g.sum(axis=0), np.ones(n)):
+        return None, None, None
+
+    # pi: shape (k,)
+    pi = g.sum(axis=1) / n
+
+    # Denominator For means/covariances:
+    # shape (k, 1) so we can broadcast
+    Nk = g.sum(axis=1)[:, np.newaxis]
+    if np.any(Nk == 0):
+        return None, None, None
+
+    # m: shape (k, d)
+    # Vectorized: g @ X yields a (k, d) result, then divide row-wise
+    m = (g @ X) / Nk
+
+    # S: shape (k, d, d), computed with at most 1 loop over k
+    S = np.zeros((k, d, d))
+    for i in range(k):  # Allowed single loop
+        t = X - m[i]           # Center data around mean
+        h = g[i] * t.T         # Multiply each column of t.T by g[i]
+        S[i] = (h @ t) / np.sum(g[i])
+
+    return pi, m, S
