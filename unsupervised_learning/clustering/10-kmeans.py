@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sklearn.cluster
-import numpy as np
 
 
 def kmeans(X, k):
