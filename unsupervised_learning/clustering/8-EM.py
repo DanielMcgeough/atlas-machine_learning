@@ -75,6 +75,7 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
 
     return pi, m, S, g, ll_old
 
+
 def log(i, v):
     """ print a log output with the iterations and a 5f value. """
 
