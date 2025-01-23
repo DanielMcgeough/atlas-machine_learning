@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""module For initialize"""
+"""shorter but by no means easier"""
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 
