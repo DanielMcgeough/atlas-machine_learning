@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""module for pdf"""
+"""setup for pdf but not the document kind"""
 import numpy as np
 
 
