@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+"""Wooo for no comprehension."""
 import sklearn.mixture
 import numpy as np
+
 
 def gmm(X, k):
     """
