@@ -26,15 +26,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
           b is a np.ndarray of shape (kmax - kmin + 1,) with BIC values
         or (None, None, None, None) on failure
     """
-    # For n in range(0):
-    #    try:
-    #        print(f"\n{n}-main.py:")
-    #        with open(f"{n}-main.py", "r") as file:
-    #            print(file.read())
-    #    except FileNotFoundError:
-    #        continue
 
-    # Do all the validations!
     conditions = [
         (isinstance(X, np.ndarray) and len(X.shape) == 2),
         (isinstance(kmin, int) and kmin >= 1),
@@ -44,7 +36,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         (isinstance(verbose, bool))
     ]
 
-    # If anything isn't kosher, return None x4.
+    # If anything isn't ok, return None x4.
     if not all(conditions):
         return None, None, None, None
 
