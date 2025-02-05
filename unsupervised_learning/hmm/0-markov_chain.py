@@ -6,7 +6,7 @@ import numpy as np
 def markov_chain(P, s, t=1):
     """
     Determines the probability of a Markov
-    chain being in a particular state 
+    chain being in a particular state
     after a specified number of iterations.
     Args:
         P: A square 2D numpy.ndarray of shape
@@ -16,15 +16,15 @@ def markov_chain(P, s, t=1):
         transitioning from state i to state j.
         s: A numpy.ndarray of shape (1, n)
         representing the probability of
-        starting 
+        starting
         in each state.
         t: The number of iterations that the
-        markov chain has been through. 
+        markov chain has been through.
         Defaults to 1.
     Returns:
         A numpy.ndarray of shape (1, n)
         representing the probability of
-        being in 
+        being in
         a specific state after t iterations,
         or None on failure.
     """
