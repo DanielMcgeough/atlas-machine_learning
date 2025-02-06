@@ -11,21 +11,34 @@ def backward(Observation, Emission, Transition, Initial):
         Observation: A numpy.ndarray of shape
         (T,) that contains the index of the
         observation.
-        Emission: A numpy.ndarray of shape (N, M) containing the emission
-             probability of a specific observation given a hidden state.
-             Emission[i, j] is the probability of observing j given the hidden
+        Emission: A numpy.ndarray of shape
+        (N, M) containing the emission
+             probability of a specific
+             observation given a hidden state.
+             Emission[i, j] is the probability
+             of observing j given the hidden
              state i.
-        Transition: A 2D numpy.ndarray of shape (N, N) containing the transition
-                probabilities. Transition[i, j] is the probability of
-                transitioning from the hidden state i to j.
-        Initial: A numpy.ndarray of shape (N, 1) containing the probability of
-            starting in a particular hidden state.
+        Transition: A 2D numpy.ndarray of
+        shape (N, N) containing the transition
+                probabilities. Transition[i, j]
+                is the probability of
+                transitioning from the hidden
+                state i to j.
+        Initial: A numpy.ndarray of shape
+        (N, 1) containing the probability of
+            starting in a particular hidden
+            state.
 
         Returns:
-        P: The likelihood of the observations given the model.
-        B: A numpy.ndarray of shape (N, T) containing the backward path
-            probabilities. B[i, j] is the probability of generating the future
-            observations from hidden state i at time j.
+        P: The likelihood of the observations
+        given the model.
+        B: A numpy.ndarray of shape (N, T)
+        containing the backward path
+            probabilities. B[i, j] is the
+            probability of generating the
+            future
+            observations from hidden state i
+            at time j.
         None, None: On failure.
     """
     conditions = [
@@ -52,7 +65,7 @@ def backward(Observation, Emission, Transition, Initial):
 
     if not all(conditions):
         return None, None
-    #need clairification on try block.
+    # need clairification on try block.
     try:
 
         T = Observation.shape[0]
