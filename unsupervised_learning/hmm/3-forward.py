@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Module for The Forward Algorithm"""
+"""Module for The Forward Algorithm
+how likely it is for a specific sequence
+of hidden events it takes to create the
+output you can observe."""
 import numpy as np
 
 
