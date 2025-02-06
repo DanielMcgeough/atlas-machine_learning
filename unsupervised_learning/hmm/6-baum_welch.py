@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """module needed and yes i do like it.
-because without it I am sunk."""
+because without it I am"""
 import numpy as np
 
 def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
