@@ -1,76 +1,111 @@
 #!/usr/bin/env python3
-"""module needed and yes i do like it.
-because without it I am"""
+"""Module for last gasp"""
 import numpy as np
 
+
 def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
-  """
-  Performs the Baum-Welch algorithm for a hidden Markov model.
+    """
+    Perform Baum-Welch algorithm for Hidden Markov Model parameter
+    estimation.
 
-  Args:
-    Observations: A numpy.ndarray of shape (T,) that contains the index of the 
-                 observation.
-    Transition: A numpy.ndarray of shape (M, M) that contains the initialized 
-                 transition probabilities.
-    Emission: A numpy.ndarray of shape (M, N) that contains the initialized 
-              emission probabilities.
-    Initial: A numpy.ndarray of shape (M, 1) that contains the initialized 
-            starting probabilities.
-    iterations: The number of times expectation-maximization should be 
-                performed. Defaults to 1000.
+    Args:
+        Observations: numpy.ndarray of shape (T,) containing observation
+                      indices
+        Transition:   numpy.ndarray of shape (M, M) with transition
+                      probabilities
+        Emission:     numpy.ndarray of shape (M, N) with emission
+                      probabilities
+        Initial:      numpy.ndarray of shape (M, 1) with starting
+                      probabilities
+        iterations:   Number of expectation-maximization iterations
 
-  Returns:
-    The converged Transition, Emission, or None, None on failure.
-  """
+    Returns:  Transition, Emission
+        Transition: Converged transition probabilities matrix
+        Emission:   Converged emission probabilities matrix
+        or None, None on failure
+    """
+    conditions = [
+        isinstance(Observations, np.ndarray),
+        isinstance(Transition, np.ndarray),
+        isinstance(Emission, np.ndarray),
+        isinstance(Initial, np.ndarray)
+    ]
 
-  try:
-    T = len(Observations)
-    M = Transition.shape[0]
-    N = Emission.shape[1]
+    if not all(conditions):
+        return None, None
 
-    # Validate input shapes
-    if Transition.shape != (M, M) or Emission.shape != (M, N) or Initial.shape != (M, 1):
-      raise ValueError("Input arrays have incorrect shapes.")
+    conditions = [
+        len(Transition.shape) == 2,
+        len(Initial.shape) == 2,
+        len(Emission.shape) == 2,
+        Transition.shape[0] == Transition.shape[1],
+        Initial.shape[1] == 1,
+        Initial.shape[0] == Transition.shape[0],
+        np.allclose(np.sum(Transition, axis=1), 1),
+        np.allclose(np.sum(Emission, axis=1), 1),
+        np.allclose(np.sum(Initial), 1)
+    ]
 
-    for _ in range(iterations):
-      # Forward-Backward Algorithm
-      alpha, beta = forward_backward(Observations, Transition, Emission, Initial)
-      gamma = alpha * beta / np.sum(alpha * beta, axis=0) 
-      xi = np.zeros((M, M, T-1))
-      for t in range(T-1):
-        xi[:, :, t] = alpha[:, t][:, np.newaxis] * Transition * Emission[:, Observations[t+1]] * beta[:, t+1]
-        xi[:, :, t] /= np.sum(xi[:, :, t])
+    if not all(conditions):
+        return None, None
 
-      # Update parameters
-      Initial = gamma[:, 0]
-      Transition = np.sum(xi, axis=2) / np.sum(gamma[:, :-1], axis=1)[:, np.newaxis]
-      Emission = np.zeros_like(Emission)
-      for j in range(N):
-        Emission[:, j] = np.sum(gamma[:, Observations == j], axis=1)
-      Emission /= np.sum(gamma, axis=1)[:, np.newaxis]
+    try:
 
-    return Transition, Emission
+        M = Transition.shape[0]
+        T = Observations.shape[0]
+        N = Emission.shape[1]
 
-  except Exception as e:
-    print(f"Error: {e}")
-    return None, None
+        for _ in range(iterations):
+            alpha = np.zeros((M, T))
+            beta = np.zeros((M, T))
 
-# Helper function for forward-backward algorithm
-def forward_backward(Observations, Transition, Emission, Initial):
-  T = len(Observations)
-  M = Transition.shape[0]
+            # Forward pass
+            alpha[:, 0] = Initial.flatten() * Emission[:, Observations[0]]
+            for t in range(1, T):
+                for j in range(M):
+                    alpha[j, t] = Emission[j, Observations[t]] * np.sum(
+                        alpha[:, t-1] * Transition[:, j]
+                    )
 
-  alpha = np.zeros((M, T))
-  beta = np.zeros((M, T))
+            # Backward pass
+            beta[:, -1] = 1
+            for t in range(T-2, -1, -1):
+                for j in range(M):
+                    beta[j, t] = np.sum(
+                        Transition[j, :] * Emission[:, Observations[t+1]] *
+                        beta[:, t+1]
+                    )
 
-  # Forward pass
-  alpha[:, 0] = Initial.flatten() * Emission[:, Observations[0]]
-  for t in range(1, T):
-    alpha[:, t] = np.dot(alpha[:, t-1], Transition) * Emission[:, Observations[t]]
+            xi = np.zeros((M, M, T-1))
+            for t in range(T-1):
+                denominator = np.sum(
+                    alpha[:, t].reshape((-1, 1)) * Transition *
+                    Emission[:, Observations[t+1]].reshape((1, -1)) *
+                    beta[:, t+1].reshape((1, -1))
+                )
+                for i in range(M):
+                    numerator = alpha[i, t] * Transition[i, :] * \
+                        Emission[:, Observations[t+1]] * beta[:, t+1]
+                    xi[i, :, t] = numerator / denominator
 
-  # Backward pass
-  beta[:, T-1] = 1
-  for t in range(T-2, -1, -1):
-    beta[:, t] = np.dot(Transition, Emission[:, Observations[t+1]] * beta[:, t+1])
+            gamma = np.sum(xi, axis=1)
+            Transition = np.sum(xi, 2) / np.sum(gamma, axis=1).reshape((-1, 1))
 
-  return alpha, beta
+            gamma = np.hstack((gamma, np.sum(
+                xi[:, :, T-2], axis=0).reshape((-1, 1))
+            ))
+
+            denominator = np.sum(gamma, axis=1)
+            for ll in range(N):
+                Emission[:, ll] = np.sum(gamma[:, Observations == ll], axis=1)
+
+            Emission = np.divide(
+                Emission, denominator.reshape((-1, 1)),
+                out=np.zeros_like(Emission),
+                where=denominator.reshape((-1, 1)) != 0
+            )
+
+        return Transition, Emission
+
+    except Exception:
+        return None, None
