@@ -41,7 +41,8 @@ class BayesianOptimization:
 
     def acquisition(self):
         """
-        Calculations fur next best sample location using Expected Improvement (EI).
+        Calculations fur next best sample location using
+        Expected Improvement (EI).
 
         Returns:
             tuple: X_next (1,) array of next best point,
@@ -82,9 +83,12 @@ class BayesianOptimization:
         The exact mathematical relationship between hyperparameters
         and model performance is usually unknown.
         It's a "black box" because:
-        We can't directly calculate the optimal hyperparameter values.
-        We don't have a formula to predict the performance for every possible combination.
-        We can only observe the output (model performance) for a given input (hyperparameter settings).
+        We can't directly calculate the optimal
+        hyperparameter values.
+        We don't have a formula to predict the performance
+        for every possible combination.
+        We can only observe the output (model performance)
+        for a given input (hyperparameter settings).
 
         Args:
             iterations: Max number of iterations 2 perform (default=100)
