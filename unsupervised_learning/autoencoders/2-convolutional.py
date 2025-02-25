@@ -25,7 +25,7 @@ def autoencoder(input_dims, filters, latent_dims):
         decoder: the decoder model
         auto: the full autoencoder model
     """
- 
+
     encoder_inputs = keras.Input(shape=input_dims)
     x = encoder_inputs
     for i in filters:
