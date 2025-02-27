@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""brick squad"""
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Lambda
 from tensorflow.keras.models import Model
