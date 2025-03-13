@@ -322,3 +322,4 @@ class Yolo:
         except Exception as e:
             print(f'Error during prediction: {str(e)}')
             raise
+
