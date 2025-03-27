@@ -7,8 +7,8 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import os
 
-DATA_DIR = 'C:\Users\danny\Downloads\bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv',
-'C:\Users\danny\Downloads\coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09.csv'
+DATA_DIR = [r'C:\Users\danny\Downloads\bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv',
+            r'C:\Users\danny\Downloads\coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09.csv']
 OUTPUT_FILE = 'preprocessed_btc_data.npz'
 SEQUENCE_LENGTH = 24 * 60  # 24 hours in minutes
 FORECAST_HORIZON = 60     # Predict the close of the next hour (60 minutes)
