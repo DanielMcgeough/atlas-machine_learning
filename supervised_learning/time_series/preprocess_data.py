@@ -14,17 +14,16 @@ SEQUENCE_LENGTH = 24 * 60  # 24 hours in minutes
 FORECAST_HORIZON = 60     # Predict the close of the next hour (60 minutes)
 
 
-def load_data(filename: str) -> pd.DataFrame or None:
+def load_data(filepath: str) -> pd.DataFrame or None:
     """
     Loads data from a CSV file into a Pandas DataFrame.
 
     Args:
-        filename (str): The name of the CSV file.
+        filepath (str): The full path to the CSV file.
 
     Returns:
         pd.DataFrame or None: The loaded DataFrame, or None if the file is not found.
     """
-    filepath = os.path.join(DATA_DIR, filename)
     try:
         df = pd.read_csv(filepath, header=None, names=['timestamp', 'open', 'high', 'low', 'close', 'volume_btc', 'volume_usd', 'vwap'])
         return df
@@ -82,13 +81,17 @@ def main():
     """
     Main function to load, preprocess, and save Bitcoin data.
     """
-    coinbase_df = load_data('coinbase.csv')
-    bitstamp_df = load_data('bitstamp.csv')
+    all_dfs = []
+    for filepath in DATA_DIR:
+        df = load_data(filepath)
+        if df is not None:
+            all_dfs.append(df)
 
-    if coinbase_df is None or bitstamp_df is None:
+    if not all_dfs:
+        print("Error: No data loaded.")
         return
 
-    combined_df = pd.concat([coinbase_df, bitstamp_df]).sort_values('timestamp').drop_duplicates(subset=['timestamp'])
+    combined_df = pd.concat(all_dfs).sort_values('timestamp').drop_duplicates(subset=['timestamp'])
     combined_df = combined_df.reset_index(drop=True)
 
     scaled_data, scaler = preprocess(combined_df)
