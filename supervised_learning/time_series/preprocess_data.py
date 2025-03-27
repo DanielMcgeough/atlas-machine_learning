@@ -7,8 +7,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import os
 
-DATA_DIR = [r'C:\Users\danny\Downloads\bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv',
-            r'C:\Users\danny\Downloads\coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09.csv']
+DATA_DIR = 'data/coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09'
 OUTPUT_FILE = 'preprocessed_btc_data.npz'
 SEQUENCE_LENGTH = 24 * 60  # 24 hours in minutes
 FORECAST_HORIZON = 60     # Predict the close of the next hour (60 minutes)
@@ -81,11 +80,16 @@ def main():
     """
     Main function to load, preprocess, and save Bitcoin data.
     """
+    coinbase_df = load_data('bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv')
+
+    if coinbase_df is not None:
+        print(f"Coinbase timestamp dtype before conversion: {coinbase_df['timestamp'].dtype}")
+        coinbase_df['timestamp'] = pd.to_numeric(coinbase_df['timestamp'], errors='coerce')
+        print(f"Coinbase timestamp dtype after conversion: {coinbase_df['timestamp'].dtype}")
+
     all_dfs = []
-    for filepath in DATA_DIR:
-        df = load_data(filepath)
-        if df is not None:
-            all_dfs.append(df)
+    if coinbase_df is not None:
+        all_dfs.append(coinbase_df)
 
     if not all_dfs:
         print("Error: No data loaded.")
@@ -94,7 +98,9 @@ def main():
     combined_df = pd.concat(all_dfs).sort_values('timestamp').drop_duplicates(subset=['timestamp'])
     combined_df = combined_df.reset_index(drop=True)
 
-    scaled_data, scaler = preprocess(combined_df)
+    print(f"Combined timestamp dtype after concatenation and conversion: {combined_df['timestamp'].dtype}")
+
+    scaled_data, scaler = preprocess(combined_df.drop(columns=['timestamp'])) # Drop timestamp before scaling
 
     if scaled_data is not None:
         sequences, targets = create_sequences(scaled_data, SEQUENCE_LENGTH, FORECAST_HORIZON)
