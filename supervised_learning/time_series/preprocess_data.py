@@ -7,7 +7,6 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import os
 
-DATA_DIR = 'data/coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09'
 OUTPUT_FILE = 'preprocessed_btc_data.npz'
 SEQUENCE_LENGTH = 24 * 60  # 24 hours in minutes
 FORECAST_HORIZON = 60     # Predict the close of the next hour (60 minutes)
@@ -45,8 +44,6 @@ def preprocess(df: pd.DataFrame) -> tuple[np.ndarray or None, MinMaxScaler or No
     if df is None:
         return None, None
 
-    print(f"Preprocessing data from {df.head(1)['timestamp'].values[0]} to {df.tail(1)['timestamp'].values[0]}")
-
     features = ['open', 'high', 'low', 'close', 'volume_btc', 'volume_usd', 'vwap']
     df_processed = df[features].copy()
 
@@ -80,11 +77,11 @@ def main():
     """
     Main function to load, preprocess, and save Bitcoin data.
     """
-    coinbase_df = load_data('bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv')
+    coinbase_df = load_data('data/coinbaseUSD_1-min_data_2014-12-01_to_2019-01-09.csv')
 
     if coinbase_df is not None:
         print(f"Coinbase timestamp dtype before conversion: {coinbase_df['timestamp'].dtype}")
-        coinbase_df['timestamp'] = pd.to_numeric(coinbase_df['timestamp'], errors='coerce')
+        coinbase_df['timestamp'] = pd.to_datetime(coinbase_df['timestamp'], errors='coerce')
         print(f"Coinbase timestamp dtype after conversion: {coinbase_df['timestamp'].dtype}")
 
     all_dfs = []
@@ -99,6 +96,10 @@ def main():
     combined_df = combined_df.reset_index(drop=True)
 
     print(f"Combined timestamp dtype after concatenation and conversion: {combined_df['timestamp'].dtype}")
+    if combined_df is not None and not combined_df.empty:
+        start_time = combined_df['timestamp'].iloc[0]
+        end_time = combined_df['timestamp'].iloc[-1]
+        print(f"Preprocessing data from {start_time} to {end_time}")
 
     scaled_data, scaler = preprocess(combined_df.drop(columns=['timestamp'])) # Drop timestamp before scaling
 
