@@ -19,14 +19,14 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         seed: seed for the random number generator
         workers: number of worker threads to train the model
 
-    Returns: the trained model
-    FastText extends Word2Vec by representing
-    words as character n-grams, enabling it to
-    handle out-of-vocabulary words and capture
-    subword information. It can use either CBOW
-    or Skip-gram architectures, like Word2Vec,
-    but its character n-gram approach makes it
-    particularly effective for morphologically rich languages."""
+        Returns: the trained model
+        FastText extends Word2Vec by representing
+        words as character n-grams, enabling it to
+        handle out-of-vocabulary words and capture
+        subword information. It can use either CBOW
+        or Skip-gram architectures, like Word2Vec,
+        but its character n-gram approach makes it
+        particularly effective for morphologically rich languages."""
     # Set training algorithm for cbow
     # Because it's CBOW sg = 0, otherwise it would be sg = 1
     sg = 0 if cbow else 1
