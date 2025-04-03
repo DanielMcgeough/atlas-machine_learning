@@ -50,13 +50,13 @@ def tf_idf(sentences, vocab=None):
             if word in frequency:
                 # Term frequency
                 tf = frequency[word]
-                
+
                 # Inverse document frequency (with smoothing)
                 # Adding 1 to numerator and denominator to prevent division by
                 # zero and reduce impact of rare terms
                 idf = np.log((1 + len(sentences)) /
                              (1 + document_frequency[word])) + 1
-                
+
                 # TF - IDF score
                 embeddings[i, j] = tf * idf
 
