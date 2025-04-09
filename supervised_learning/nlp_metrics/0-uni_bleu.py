@@ -20,15 +20,16 @@ def uni_bleu(references, sentence):
     if not sentence:
         return 0.0
 
+    sentence_counts = Counter(sentence)
     clipped_count = 0
-    for word in sentence:
+
+    for word, count in sentence_counts.items():
         max_ref_count = 0
         for reference in references:
-            ref_count = Counter(reference)[word]
+            ref_count = Counter(reference).get(word, 0)
             if ref_count > max_ref_count:
                 max_ref_count = ref_count
-        if Counter(sentence)[word] > 0 and max_ref_count > 0:
-            clipped_count += 1 if Counter(sentence)[word] <= max_ref_count else max_ref_count
+        clipped_count += min(count, max_ref_count)
 
     precision = clipped_count / len(sentence) if sentence else 0.0
 
@@ -36,11 +37,12 @@ def uni_bleu(references, sentence):
     sentence_len = len(sentence)
     for reference in references:
         ref_len = len(reference)
-        if abs(ref_len - sentence_len) < abs(closest_ref_len - sentence_len):
+        diff = abs(ref_len - sentence_len)
+        closest_diff = abs(closest_ref_len - sentence_len)
+        if diff < closest_diff:
             closest_ref_len = ref_len
-        elif abs(ref_len - sentence_len) == abs(closest_ref_len - sentence_len):
-            if ref_len < closest_ref_len:
-                closest_ref_len = ref_len
+        elif diff == closest_diff and ref_len < closest_ref_len:
+            closest_ref_len = ref_len
 
     brevity_penalty = 1.0
     if sentence_len < closest_ref_len:
