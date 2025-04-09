@@ -44,15 +44,6 @@ def cumulative_bleu(references, sentence, n):
     if sentence_len < closest_ref_len:
         brevity_penalty = np.exp(1 - closest_ref_len / sentence_len)
 
-    #!/usr/bin/env python3
-"""Calculates the cumulative n-gram BLEU score for a sentence."""
-import numpy as np
-from collections import Counter
-
-
-def cumulative_bleu(references, sentence, n):
-    # ... (rest of your function) ...
-
     log_sum = 0.0
     precisions = []
     for i in range(1, n + 1):
@@ -73,7 +64,7 @@ def cumulative_bleu(references, sentence, n):
         precisions.append(precision)
         log_sum += np.log(precision) if precision > 0 else 0
 
-    print(f"Precisions: {precisions}")  # Add this line for debugging
+    print(f"Precisions: {precisions}")  # Added for debugging
 
     cumulative_bleu_score = brevity_penalty * np.exp(log_sum / n) if n > 0 else 0.0
     return cumulative_bleu_score
