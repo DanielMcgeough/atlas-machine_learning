@@ -24,10 +24,11 @@ def cumulative_bleu(references, sentence, n):
 
     def _get_ngrams(words, n_gram):
         """Generates n-grams from a list of words."""
-        ngrams = []
-        for i in range(len(words) - n_gram + 1):
-            ngrams.append(tuple(words[i:i + n_gram]))
-        return ngrams
+    ngram_list = []
+    for i in range(len(seq) - n + 1):
+        ngram = tuple(seq[i:i + n])
+        ngram_list.append(ngram)
+    return ngram_list
 
     sentence_len = len(sentence)
     closest_ref_len = float('inf')
