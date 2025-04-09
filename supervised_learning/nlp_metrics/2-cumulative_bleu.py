@@ -45,7 +45,6 @@ def cumulative_bleu(references, sentence, n):
         brevity_penalty = np.exp(1 - closest_ref_len / sentence_len)
 
     log_sum = 0.0
-    precisions = []
     for i in range(1, n + 1):
         sentence_ngrams = _get_ngrams(sentence, i)
         if not sentence_ngrams:
@@ -61,10 +60,8 @@ def cumulative_bleu(references, sentence, n):
                         max_ref_count = ref_count
                 clipped_count += min(Counter(sentence_ngrams)[ngram], max_ref_count)
             precision = clipped_count / len(sentence_ngrams)
-        precisions.append(precision)
-        log_sum += np.log(precision) if precision > 0 else 0
 
-    print(f"Precisions: {precisions}")  # Added for debugging
+        log_sum += np.log(precision) if precision > 0 else 0
 
     cumulative_bleu_score = brevity_penalty * np.exp(log_sum / n) if n > 0 else 0.0
     return cumulative_bleu_score
