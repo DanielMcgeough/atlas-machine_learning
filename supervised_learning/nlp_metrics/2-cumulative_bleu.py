@@ -58,10 +58,14 @@ def cumulative_bleu(references, sentence, n):
                     ref_count = Counter(ref_ngrams)[ngram]
                     if ref_count > max_ref_count:
                         max_ref_count = ref_count
-                clipped_count += min(Counter(sentence_ngrams)[ngram], max_ref_count)
+                clipped_count += min(
+                    Counter(sentence_ngrams)[ngram],
+                    max_ref_count
+                )
             precision = clipped_count / len(sentence_ngrams)
 
         log_sum += np.log(precision) if precision > 0 else 0
 
-    cumulative_bleu_score = brevity_penalty * np.exp(log_sum / n) if n > 0 else 0.0
+    cumulative_bleu_score = (brevity_penalty *
+                              np.exp(log_sum / n) if n > 0 else 0.0)
     return cumulative_bleu_score
