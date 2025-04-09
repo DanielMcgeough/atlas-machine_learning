@@ -41,7 +41,9 @@ def ngram_bleu(references, sentence, n):
             if ref_count > max_ref_count:
                 max_ref_count = ref_count
         if Counter(sentence_ngrams)[ngram] > 0 and max_ref_count > 0:
-            clipped_count += min(Counter(sentence_ngrams)[ngram], max_ref_count)
+            clipped_count += min(
+                Counter(sentence_ngrams)[ngram], max_ref_count
+                )
 
     precision = clipped_count / len(sentence_ngrams) if sentence_ngrams else 0.0
 
