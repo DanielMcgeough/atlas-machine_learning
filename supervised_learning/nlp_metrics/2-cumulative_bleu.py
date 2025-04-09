@@ -31,7 +31,6 @@ def cumulative_bleu(references, sentence, n):
 
     sentence_len = len(sentence)
     closest_ref_len = float('inf')
-    shortest_ref_len = float('inf')
     for reference in references:
         ref_len = len(reference)
         diff = abs(ref_len - sentence_len)
@@ -40,13 +39,9 @@ def cumulative_bleu(references, sentence, n):
             closest_ref_len = ref_len
         elif diff == closest_diff and ref_len < closest_ref_len:
             closest_ref_len = ref_len
-        shortest_ref_len = min(shortest_ref_len, ref_len)
 
     brevity_penalty = 1.0
-    # Try using the shortest reference length for the penalty if sentence is shorter
-    if sentence_len < shortest_ref_len:
-        brevity_penalty = np.exp(1 - shortest_ref_len / sentence_len)
-    elif sentence_len < closest_ref_len: # Fallback to closest if not shorter than all
+    if sentence_len < closest_ref_len:
         brevity_penalty = np.exp(1 - closest_ref_len / sentence_len)
 
     log_sum = 0.0
@@ -73,3 +68,10 @@ def cumulative_bleu(references, sentence, n):
 
     cumulative_bleu_score = brevity_penalty * np.exp(log_sum / n) if n > 0 else 0.0
     return cumulative_bleu_score
+
+
+if __name__ == '__main__':
+    references = [["the", "cat", "is", "on", "the", "mat"], ["there", "is", "a", "cat", "on", "the", "mat"]]
+    sentence = ["there", "is", "a", "cat", "here"]
+
+    print(cumulative_bleu(references, sentence, 4))
