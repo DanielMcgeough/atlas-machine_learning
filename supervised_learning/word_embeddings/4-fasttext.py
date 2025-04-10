@@ -17,18 +17,9 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         epoch: number of iterations to train over
         seed: seed for the random number generator
         workers: number of worker threads to train the model
-
-        Returns: the trained model
-        FastText extends Word2Vec by representing
-        words as character n-grams, enabling it to
-        handle out-of-vocabulary words and capture
-        subword information. It can use either CBOW
-        or Skip-gram architectures, like Word2Vec,
-        but its character n-gram approach makes it
-        particularly effective for morphologically rich languages."""
-
+    Returns: the trained model"""
     # fastText model with specific parameters
-    model = gensim.models.fasttext(
+    model = gensim.models.FastText(
         sentences,
         vector_size=vector_size,
         window=window,
@@ -39,15 +30,12 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         epochs=epochs,
         sg=not cbow
     )
-
     # Build the vocab from sentences
     model.build_vocab(sentences)
-
     # Train model on the input sentences
     model.train(
         sentences,
         total_examples=model.corpus_count,
         epochs=epochs
     )
-
     return model
