@@ -34,10 +34,10 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         window=window,
         min_count=min_count,
         negative=negative,
-        sg=not cbow,
         seed=seed,
         workers=workers,
-        epochs=epochs
+        epochs=epochs,
+        sg=not cbow
     )
 
     # Build the vocab from sentences
