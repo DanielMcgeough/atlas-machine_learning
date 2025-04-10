@@ -26,9 +26,6 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         or Skip-gram architectures, like Word2Vec,
         but its character n-gram approach makes it
         particularly effective for morphologically rich languages."""
-    # Set training algorithm for cbow
-    # Because it's CBOW sg = 0, otherwise it would be sg = 1
-    sg = 0 if cbow else 1
 
     # fastText model with specific parameters
     model = gensim.models.fasttext(
@@ -37,7 +34,7 @@ def fasttext_model(sentences, vector_size=100, min_count=5, negative=5,
         window=window,
         min_count=min_count,
         negative=negative,
-        sg=sg,
+        sg=not cbow,
         seed=seed,
         workers=workers,
         epochs=epochs
