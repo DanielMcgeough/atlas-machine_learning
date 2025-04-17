@@ -15,25 +15,22 @@ class Dataset:
         """
         Class constructor.
         Creates the instance attributes:
-            data_train: tf.data.Dataset containing the train split.
-            data_valid: tf.data.Dataset containing the validate split.
-            tokenizer_pt: Portuguese tokenizer.
-            tokenizer_en: English tokenizer.
+            data_train: tf.data.Dataset containing the train split,
+                        loaded as_supervised.
+            data_valid: tf.data.Dataset containing the validate split,
+                        loaded as_supervised.
+            tokenizer_pt: Portuguese tokenizer created from the training set.
+            tokenizer_en: English tokenizer created from the training set.
         """
-        # Load and print the first example from the training data.
-        pt2en_train = tfds.load('ted_hrlr_translate/pt_to_en', split='train', as_supervised=True)
-        for pt, en in pt2en_train.take(1):
-            print(pt.numpy().decode('utf-8'))
-            print(en.numpy().decode('utf-8'))
-
         # Load the training and validation data.
         self.data_train, self.data_valid = tfds.load(
             'ted_hrlr_translate/pt_to_en',
             split=['train', 'validation'],
             as_supervised=True
         )
-        # Tokenize the dataset.
-        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(self.data_train)
+        # Create the tokenizers.
+        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
+            self.data_train)
 
     def tokenize_dataset(self, data):
         """
@@ -48,14 +45,15 @@ class Dataset:
             tokenizer_pt: Portuguese tokenizer.
             tokenizer_en: English tokenizer.
         """
+        # Use pre-trained tokenizers.
         tokenizer_pt = transformers.BertTokenizerFast.from_pretrained(
             'neuralmind/bert-base-portuguese-cased',
-            max_len=128,  # Add max_len
-            do_lower_case=False,
+            max_len=128,  # Add max_len for consistency
+            do_lower_case=False,  # Important for this specific model
         )
         tokenizer_en = transformers.BertTokenizerFast.from_pretrained(
             'bert-base-uncased',
-            max_len=128,  # Add max_len
+            max_len=128, # Add max_len for consistency
         )
 
         def tokenize_fn(pt, en):
@@ -80,12 +78,9 @@ class Dataset:
         # Map the tokenization function
         tokenized_data = data.map(
             lambda pt, en: tokenize_fn(pt, en),
+            num_parallel_calls=tf.data.AUTOTUNE
         )
-        # Get the tokenizer.
-        tokenizer_pt = tokenizer_pt
-        tokenizer_en = tokenizer_en
-
-        # Adapt the tokenizers (this is crucial for setting the vocabulary)
+        # Train the tokenizers with a maximum vocabulary size of 2**13.
         tokenizer_pt.train_new_from_iterator(
             (text.numpy().decode('utf-8') for text, _ in self.data_train),
             vocab_size=2**13
