@@ -5,6 +5,8 @@ for machine translation, adhering to restricted import rules.
 """
 import tensorflow_datasets as tfds
 import transformers
+import tensorflow as tf
+
 
 class Dataset:
     """
