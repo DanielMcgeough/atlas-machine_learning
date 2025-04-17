@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 This module defines the Dataset class for loading and preprocessing a dataset
-for machine translation.
+for machine translation, adhering to restricted import rules.
 """
 import tensorflow as tf
 import tensorflow_datasets as tfds
