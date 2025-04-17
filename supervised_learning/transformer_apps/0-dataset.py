@@ -78,15 +78,19 @@ class Dataset:
         # Map the tokenization function
         tokenized_data = data.map(
             lambda pt, en: tokenize_fn(pt, en),
-            num_parallel_calls=tf.data.AUTOTUNE
         )
         # Train the tokenizers with a maximum vocabulary size of 2**13.
+
+        def extract_text(ds):
+            for pt, en in tfds.as_numpy(ds): # Use tfds.as_numpy
+                yield pt.decode('utf-8') if pt else '', en.decode('utf-8') if en else ''
+
         tokenizer_pt.train_new_from_iterator(
-            (text.numpy().decode('utf-8') for text, _ in self.data_train),
+            (pt_text for pt_text, _ in extract_text(self.data_train)),
             vocab_size=2**13
         )
         tokenizer_en.train_new_from_iterator(
-            (text.numpy().decode('utf-8') for _, text in self.data_train),
+            (en_text for _, en_text in extract_text(self.data_train)),
             vocab_size=2**13
         )
 
