@@ -67,8 +67,8 @@ class Dataset:
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                tfds.as_tensor(pt_tokens, dtype=tfds.int64),
-                tfds.as_tensor(en_tokens, dtype=tfds.int64)
+                tfds.as_numpy(pt_tokens, dtype=tfds.int64),
+                tfds.as_numpy(en_tokens, dtype=tfds.int64)
             )
 
         # Map the tokenization function
