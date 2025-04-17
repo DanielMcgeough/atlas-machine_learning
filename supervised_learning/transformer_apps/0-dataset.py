@@ -3,7 +3,6 @@
 This module defines the Dataset class for loading and preprocessing a dataset
 for machine translation, adhering to restricted import rules.
 """
-import tensorflow as tf
 import tensorflow_datasets as tfds
 import transformers
 
@@ -68,14 +67,14 @@ class Dataset:
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                tf.constant(pt_tokens, dtype=tf.int64),
-                tf.constant(en_tokens, dtype=tf.int64)
+                tfds.as_tensor(pt_tokens, dtype=tfds.int64),
+                tfds.as_tensor(en_tokens, dtype=tfds.int64)
             )
 
         # Map the tokenization function
         tokenized_data = data.map(
             lambda pt, en: tf.numpy_function(
-                tokenize_fn, inp=[pt, en], Tout=(tf.int64, tf.int64)
+                tokenize_fn, inp=[pt, en], Tout=(tfds.int64, tfds.int64)
             ),
             num_parallel_calls=tf.data.AUTOTUNE
         )
