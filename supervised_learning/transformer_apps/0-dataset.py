@@ -83,7 +83,7 @@ class Dataset:
 
         def extract_text(ds):
             for pt, en in tfds.as_numpy(ds): # Use tfds.as_numpy
-                yield pt.decode('utf-8') if pt else '', en.decode('utf-8') if en else ''
+                yield pt.decode('utf-8'), en.decode('utf-8')
 
         tokenizer_pt.train_new_from_iterator(
             (pt_text for pt_text, _ in extract_text(self.data_train)),
