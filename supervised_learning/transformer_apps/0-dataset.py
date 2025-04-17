@@ -3,6 +3,7 @@
 This module defines the Dataset class for loading and preprocessing a dataset
 for machine translation.
 """
+import tensorflow as tf
 import tensorflow_datasets as tfds
 import transformers
 
@@ -14,6 +15,7 @@ class Dataset:
     def __init__(self):
         """
         Class constructor.
+
         Creates the instance attributes:
             data_train: tf.data.Dataset containing the train split,
                         loaded as_supervised.
@@ -66,31 +68,29 @@ class Dataset:
 
             Returns:
                 A tuple containing the tokenized Portuguese and English sentences
-                as Python lists of integers.
+                as tf.Tensor objects.
             """
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                pt_tokens,
-                en_tokens,
+                tf.constant(pt_tokens, dtype=tf.int64),
+                tf.constant(en_tokens, dtype=tf.int64)
             )
 
         # Map the tokenization function
         tokenized_data = data.map(
-            lambda pt, en: tokenize_fn(pt, en),
+            lambda pt, en: tf.numpy_function(
+                tokenize_fn, inp=[pt, en], Tout=(tf.int64, tf.int64)
+            ),
+            num_parallel_calls=tf.data.AUTOTUNE
         )
         # Train the tokenizers with a maximum vocabulary size of 2**13.
-
-        def extract_text(ds):
-            for pt, en in tfds.as_numpy(ds): # Use tfds.as_numpy
-                yield pt.decode('utf-8'), en.decode('utf-8')
-
         tokenizer_pt.train_new_from_iterator(
-            (pt_text for pt_text, _ in extract_text(self.data_train)),
+            (text.numpy().decode('utf-8') for text, _ in self.data_train),
             vocab_size=2**13
         )
         tokenizer_en.train_new_from_iterator(
-            (en_text for _, en_text in extract_text(self.data_train)),
+            (text.numpy().decode('utf-8') for _, text in self.data_train),
             vocab_size=2**13
         )
 
