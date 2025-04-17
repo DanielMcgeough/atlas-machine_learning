@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
 This module defines the Dataset class for loading and preprocessing a dataset
-for machine translation, adhering to restricted import rules.
+for machine translation.
 """
+import tensorflow as tf
 import tensorflow_datasets as tfds
 import transformers
-import tensorflow as tf
-
 
 class Dataset:
     """
@@ -45,12 +44,12 @@ class Dataset:
         """
         tokenizer_pt = transformers.BertTokenizerFast.from_pretrained(
             'neuralmind/bert-base-portuguese-cased',
-            max_len=128,  # Add max_len for consistency
-            do_lower_case=False,  # Important for this specific model
+            max_len=128,  # Add max_len
+            do_lower_case=False,
         )
         tokenizer_en = transformers.BertTokenizerFast.from_pretrained(
             'bert-base-uncased',
-            max_len=128, # Add max_len for consistency
+            max_len=128,  # Add max_len
         )
 
         def tokenize_fn(pt, en):
@@ -63,18 +62,20 @@ class Dataset:
 
             Returns:
                 A tuple containing the tokenized Portuguese and English sentences
-                as Python lists of integers.
+                as tf.Tensor objects.
             """
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                pt_tokens,
-                en_tokens,
+                tf.constant(pt_tokens, dtype=tf.int64),
+                tf.constant(en_tokens, dtype=tf.int64)
             )
 
         # Map the tokenization function
         tokenized_data = data.map(
-            lambda pt, en: tokenize_fn(pt, en),  # Use the pure Python function
+            lambda pt, en: tf.numpy_function(
+                tokenize_fn, inp=[pt, en], Tout=(tf.int64, tf.int64)
+            ),
             num_parallel_calls=tf.data.AUTOTUNE
         )
         # Get the tokenizer.
