@@ -61,7 +61,7 @@ class Dataset:
 
             Returns:
                 A tuple containing the tokenized Portuguese and English sentences
-                as tf.Tensor objects.
+                as Python lists of integers.
             """
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
