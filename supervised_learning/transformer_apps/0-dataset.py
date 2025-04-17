@@ -20,13 +20,20 @@ class Dataset:
             tokenizer_pt: Portuguese tokenizer.
             tokenizer_en: English tokenizer.
         """
+        # Load and print the first example from the training data.
+        pt2en_train = tfds.load('ted_hrlr_translate/pt_to_en', split='train', as_supervised=True)
+        for pt, en in pt2en_train.take(1):
+            print(pt.numpy().decode('utf-8'))
+            print(en.numpy().decode('utf-8'))
+
+        # Load the training and validation data.
         self.data_train, self.data_valid = tfds.load(
             'ted_hrlr_translate/pt_to_en',
             split=['train', 'validation'],
             as_supervised=True
         )
-        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
-            self.data_train)
+        # Tokenize the dataset.
+        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(self.data_train)
 
     def tokenize_dataset(self, data):
         """
@@ -61,21 +68,18 @@ class Dataset:
 
             Returns:
                 A tuple containing the tokenized Portuguese and English sentences
-                as tf.Tensor objects.
+                as Python lists of integers.
             """
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                tf.constant(pt_tokens, dtype=tf.int64),
-                tf.constant(en_tokens, dtype=tf.int64)
+                pt_tokens,
+                en_tokens,
             )
 
         # Map the tokenization function
         tokenized_data = data.map(
-            lambda pt, en: tf.numpy_function(
-                tokenize_fn, inp=[pt, en], Tout=(tf.int64, tf.int64)
-            ),
-            num_parallel_calls=tf.data.AUTOTUNE
+            lambda pt, en: tokenize_fn(pt, en),
         )
         # Get the tokenizer.
         tokenizer_pt = tokenizer_pt
