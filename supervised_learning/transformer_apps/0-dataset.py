@@ -5,7 +5,7 @@ for machine translation, adhering to restricted import rules.
 """
 import tensorflow_datasets as tfds
 import transformers
-
+import numpy  # Import numpy
 
 class Dataset:
     """
@@ -67,15 +67,13 @@ class Dataset:
             pt_tokens = tokenizer_pt.encode(pt.numpy().decode('utf-8'))
             en_tokens = tokenizer_en.encode(en.numpy().decode('utf-8'))
             return (
-                tfds.as_numpy(pt_tokens, dtype=tfds.int64),
-                tfds.as_numpy(en_tokens, dtype=tfds.int64)
+                tfds.as_numpy(pt_tokens, dtype=numpy.int64),
+                tfds.as_numpy(en_tokens, dtype=numpy.int64)
             )
 
         # Map the tokenization function
         tokenized_data = data.map(
-            lambda pt, en: tf.numpy_function(
-                tokenize_fn, inp=[pt, en], Tout=(tfds.int64, tfds.int64)
-            ),
+            lambda pt, en: numpy.array(tokenize_fn(pt, en), dtype=numpy.int64),
             num_parallel_calls=tf.data.AUTOTUNE
         )
         # Get the tokenizer.
