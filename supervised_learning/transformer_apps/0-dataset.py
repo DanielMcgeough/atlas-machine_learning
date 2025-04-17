@@ -11,7 +11,7 @@ class Dataset:
     """class for a dataset"""
 
     def __init__(self):
-        """documentation"""
+        """initialize"""
 
         self.data_train = tfds.load(
             "ted_hrlr_translate/pt_to_en", split="train", as_supervised=True
@@ -25,7 +25,7 @@ class Dataset:
             self.data_train)
 
     def tokenize_dataset(self, data):
-        """Documentation"""
+        """tokenize the dataset to prepare it for translation word by word"""
 
         en_base = []
         pt_base = []
@@ -59,6 +59,5 @@ class Dataset:
             text_iterator=pt_iterator(), vocab_size=vocab_size
         )
 
-        # Train here somewhere I guess
         # They need to be trained on the data passed in
         return pt_model_trained, en_model_trained
