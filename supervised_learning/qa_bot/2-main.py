@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-question_answer = __import__('0-qa').question_answer
+answer_loop = __import__('2-qa').answer_loop
 
 with open('ZendeskArticles/PeerLearningDays.md') as f:
     reference = f.read()
 
-print(question_answer('When are PLDs?', reference))
+answer_loop(reference)
+

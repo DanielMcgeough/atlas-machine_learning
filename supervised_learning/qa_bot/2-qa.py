@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 """
-Module for performing Question Answering using a pre-trained BERT model.
+This script takes user input, responds with "A: ", and exits on specific input.
 """
-
-import tensorflow as tf
-import tensorflow_hub as hub
-from transformers import BertTokenizer
-import numpy as np  # Although not directly used, TF might rely on it
-
 
 def question_answer(question, reference):
     """
@@ -111,6 +105,26 @@ def question_answer(question, reference):
     return answer if answer else None
 
 
+def answer_loop(reference):
+    """
+    Answers questions from a reference text.
+
+    Args:
+        reference (str): The reference text to answer questions from.
+    """
+    while True:
+        user_input = input("Q: ")
+        if user_input.lower() in ["exit", "quit", "goodbye", "bye"]:
+            print("A: Goodbye")
+            break
+        else:
+            answer = question_answer(user_input, reference)
+            if answer:
+                print(f"A: {answer}")
+            else:
+                print("A: Sorry, I do not understand your question.")
+
+
 
 if __name__ == '__main__':
     reference_text = """
@@ -119,18 +133,4 @@ if __name__ == '__main__':
     The upcoming PLD is scheduled for October 22nd, 2025.
     Participants are encouraged to come prepared with topics they wish to discuss or present.
     """
-    question1 = "When are PLDs held?"
-    answer1 = question_answer(question1, reference_text)
-    print(f"Question: {question1}\nAnswer: {answer1}\n")
-
-    question2 = "What is the purpose of PLDs?"
-    answer2 = question_answer(question2, reference_text)
-    print(f"Question: {question2}\nAnswer: {answer2}\n")
-
-    question3 = "When is the next PLD scheduled?"
-    answer3 = question_answer(question3, reference_text)
-    print(f"Question: {question3}\nAnswer: {answer3}\n")
-
-    question4 = "What should participants bring?"
-    answer4 = question_answer(question4, reference_text)
-    print(f"Question: {question4}\nAnswer: {answer4}\n")
+    answer_loop(reference_text)
