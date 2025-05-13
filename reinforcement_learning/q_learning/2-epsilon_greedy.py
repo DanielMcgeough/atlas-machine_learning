@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""Loads the FrozenLake environment from
+Gymnasium."""
+
+import numpy as np
+
+
 def epsilon_greedy(Q, state, epsilon):
     """
     Uses epsilon-greedy to determine the next action.
