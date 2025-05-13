@@ -1,50 +1,58 @@
 #!/usr/bin/env python3
-"""Implements the Q-learning algorithm for training an agent."""
 
-import gymnasium as gym
+"""This function plays trained an agent """
+
 import numpy as np
 
 
 def play(env, Q, max_steps=100):
-    """
-    Plays an episode with the trained agent (exploiting the Q-table).
+    """Plays out the trained agent
+    env - the environment in which we play
+    Q - the already trained Q-table
+    max_steps - Boiyo is not allowed any more steps than this
 
-    Args:
-        env (gym.Env): The FrozenLakeEnv instance.
-        Q (numpy.ndarray): The trained Q-table.
-        max_steps (int, optional): The maximum number of steps in the episode.
-            Defaults to 100.
+    returns
+    rewards - the toal rewards for the episode
+    board_states - list of rendered outputs of the board state
 
-    Returns:
-        tuple: (total_reward, episode_states)
-            - total_reward (float): The total reward for the episode.
-            - episode_states (list): A list of strings, where each string
-              represents the rendered board state at each step.
-    """
-    state = env.reset()[0]
+    What exactly makes epsilon greedy though?
+
+    Also, is this just a limited version of task 3???
+    I'm so confused."""
+
+    # Okay so first things first
+    # We need vars for the returns
+    # One of them holding each state I guess
+    # I have no idea how to get the "rendered output" that they're asking for
+
+    rendered_output = []
     total_reward = 0
-    episode_states = []
-    done = False
-    truncated = False
 
-    for step in range(max_steps):
-        # Exploit: Choose the action with the highest Q-value
+    state = env.reset()[0]
+    rendered_output.append(env.render())
+
+    # ^^^ Not sure about this one but we'll try it
+    terminated, truncated = False, False
+    step_counter = 0
+
+    while not terminated and not truncated:
         action = np.argmax(Q[state, :])
-        new_state, reward, done, truncated, _ = env.step(action)
 
-        # Render the current state of the environment as a string
-        rendered_state = env.render()
-        episode_states.append(rendered_state)
-        print(rendered_state) # Print the current state
+        new_state, reward, terminated, truncated, _ = env.step(action)
 
-        total_reward += reward
+        step_counter += 1
+
         state = new_state
 
-        if done or truncated:
+        rendered_output.append(env.render())
+
+        if step_counter >= max_steps:
             break
 
-    # Print the final state of the environment.
-    final_rendered_state = env.render()
-    episode_states.append(final_rendered_state)
-    print(final_rendered_state)
-    return total_reward, episode_states
+    # if reward == 1:
+        # total_reward = 1
+    # I know that doesn't need to be that way but oh well
+
+    env.close()
+
+    return reward, rendered_output
