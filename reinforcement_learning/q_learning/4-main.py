@@ -1,22 +1,50 @@
 #!/usr/bin/env python3
+"""Implements the Q-learning algorithm for training an agent."""
 
-load_frozen_lake = __import__('0-load_env').load_frozen_lake
-q_init = __import__('1-q_init').q_init
-train = __import__('3-q_learning').train
-play = __import__('4-play').play
-
+import gymnasium as gym
 import numpy as np
 
-np.random.seed(0)
-desc = [['S', 'F', 'F'], ['F', 'H', 'H'], ['F', 'F', 'G']]
-env = load_frozen_lake(desc=desc)
-Q = q_init(env)
 
-Q, _ = train(env, Q)
+def play(env, Q, max_steps=100):
+    """
+    Plays an episode with the trained agent (exploiting the Q-table).
 
-env.reset()
-total_rewards, rendered_outputs = play(env, Q)
+    Args:
+        env (gym.Env): The FrozenLakeEnv instance.
+        Q (numpy.ndarray): The trained Q-table.
+        max_steps (int, optional): The maximum number of steps in the episode.
+            Defaults to 100.
 
-print(f'Total Rewards: {total_rewards}')
-for output in rendered_outputs:
-    print(output)
+    Returns:
+        tuple: (total_reward, episode_states)
+            - total_reward (float): The total reward for the episode.
+            - episode_states (list): A list of strings, where each string
+              represents the rendered board state at each step.
+    """
+    state = env.reset()[0]
+    total_reward = 0
+    episode_states = []
+    done = False
+    truncated = False
+
+    for step in range(max_steps):
+        # Exploit: Choose the action with the highest Q-value
+        action = np.argmax(Q[state, :])
+        new_state, reward, done, truncated, _ = env.step(action)
+
+        # Render the current state of the environment as a string
+        rendered_state = env.render()
+        episode_states.append(rendered_state)
+        print(rendered_state) # Print the current state
+
+        total_reward += reward
+        state = new_state
+
+        if done or truncated:
+            break
+
+    # Print the final state of the environment.
+    final_rendered_state = env.render()
+    episode_states.append(final_rendered_state)
+    print(final_rendered_state)
+    return total_reward, episode_states
