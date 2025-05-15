@@ -1,58 +1,22 @@
 #!/usr/bin/env python3
 
-"""This function plays trained an agent """
+load_frozen_lake = __import__('0-load_env').load_frozen_lake
+q_init = __import__('1-q_init').q_init
+train = __import__('3-q_learning').train
+play = __import__('4-play').play
 
 import numpy as np
 
+np.random.seed(0)
+desc = [['S', 'F', 'F'], ['F', 'H', 'H'], ['F', 'F', 'G']]
+env = load_frozen_lake(desc=desc)
+Q = q_init(env)
 
-def play(env, Q, max_steps=100):
-    """Plays out the trained agent
-    env - the environment in which we play
-    Q - the already trained Q-table
-    max_steps - Boiyo is not allowed any more steps than this
+Q, _ = train(env, Q)
 
-    returns
-    rewards - the toal rewards for the episode
-    board_states - list of rendered outputs of the board state
+env.reset()
+total_rewards, rendered_outputs = play(env, Q)
 
-    What exactly makes epsilon greedy though?
-
-    Also, is this just a limited version of task 3???
-    I'm so confused."""
-
-    # Okay so first things first
-    # We need vars for the returns
-    # One of them holding each state I guess
-    # I have no idea how to get the "rendered output" that they're asking for
-
-    rendered_output = []
-    total_reward = 0
-
-    state = env.reset()[0]
-    rendered_output.append(env.render())
-
-    # ^^^ Not sure about this one but we'll try it
-    terminated, truncated = False, False
-    step_counter = 0
-
-    while not terminated and not truncated:
-        action = np.argmax(Q[state, :])
-
-        new_state, reward, terminated, truncated, _ = env.step(action)
-
-        step_counter += 1
-
-        state = new_state
-
-        rendered_output.append(env.render())
-
-        if step_counter >= max_steps:
-            break
-
-    # if reward == 1:
-        # total_reward = 1
-    # I know that doesn't need to be that way but oh well
-
-    env.close()
-
-    return reward, rendered_output
+print(f'Total Rewards: {total_rewards}')
+for output in rendered_outputs:
+    print(output)
