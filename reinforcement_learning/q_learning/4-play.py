@@ -24,6 +24,7 @@ def play(env, Q, max_steps=100):
     state = env.reset()[0]
     total_reward = 0
     episode_states = []
+    episode_states.append(env.render())
     done = False
     truncated = False
 
