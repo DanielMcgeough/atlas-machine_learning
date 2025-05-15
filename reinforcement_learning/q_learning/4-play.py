@@ -38,6 +38,4 @@ def play(env, Q, max_steps=100):
         if done or truncated:
             break
 
-    final_rendered_state = env.render()
-    episode_states.append(final_rendered_state)
     return total_reward, episode_states
