@@ -21,7 +21,8 @@ from tensorflow.keras.optimizers import Adam
 from rl.agents import DQNAgent
 from rl.memory import SequentialMemory
 from rl.policy import EpsGreedyQPolicy, GreedyQPolicy
-from tensorflow import keras  # Import Keras
+import tensorflow as tf  # Import TensorFlow
+import tensorflow.keras as keras  # Import Keras
 
 
 def create_atari_environment(game_name="BreakoutNoFrameskip-v4", noop_max=30):
