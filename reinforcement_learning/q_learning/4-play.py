@@ -32,7 +32,6 @@ def play(env, Q, max_steps=100):
         new_state, reward, done, truncated, _ = env.step(action)
         rendered_state = env.render()
         episode_states.append(rendered_state)
-        print(rendered_state)
         total_reward += reward
         state = new_state
         if done or truncated:
