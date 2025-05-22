@@ -4,7 +4,6 @@ Performs the Monte Carlo algorithm for value estimation.
 """
 
 import numpy as np
-# gymnasium is not imported here as per the constraint that only numpy is allowed.
 
 
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
