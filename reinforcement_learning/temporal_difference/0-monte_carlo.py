@@ -1,71 +1,72 @@
 #!/usr/bin/env python3
-"""
-Performs the Monte Carlo algorithm for value estimation.
-"""
-
+"""uses monte carlo method"""
 import numpy as np
 
 
-def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
+def monte_carlo(
+        env,
+        V,
+        policy,
+        episodes=5000,
+        max_steps=100,
+        gamma=0.99,
+        alpha=0.1):
     """
-    Performs the Monte Carlo algorithm for value estimation.
+    Monte Carlo evaluation with First-Visit MC.
 
-    Args:
-        env (object): The environment instance (expected to be a Gymnasium Env).
-        V (numpy.ndarray): A numpy.ndarray of shape (s,) containing the
-            value estimate for each state.
-        policy (function): A function that takes in a state and returns
-            the next action to take.
-        episodes (int, optional): The total number of episodes to train over.
-            Defaults to 5000.
-        max_steps (int, optional): The maximum number of steps per episode.
-            Defaults to 100.
-        alpha (float, optional): The learning rate. Defaults to 0.1.
-        gamma (float, optional): The discount rate. Defaults to 0.99.
+    Parameters:
+    -----------
+    env : gymnasium.Env
+        The environment instance.
+    policy : callable
+        Function mapping state -> action.
+    episodes : int
+        Number of episodes to run.
+    max_steps : int
+        Max steps per episode.
+    gamma : float
+        Discount factor.
 
     Returns:
-        numpy.ndarray: V, the updated value estimate.
+    --------
+    V : np.ndarray
+        Estimated value function (shape depends on env.observation_space.n).
     """
+
     for episode in range(episodes):
-        # Reset environment for a new episode
-        # env.reset() returns (observation, info), we only need the observation
-        state = env.reset()[0]
-        episode_history = []  # Stores (state, reward) for the episode
-        done = False
-        truncated = False
+        visitedStatesInEpisode = []
 
-        for step in range(max_steps):
-            action = policy(state)  # Get action from the policy
-            new_state, reward, done, truncated, _ = env.step(action)
+        rewardInVisitedState = []
+        currentState, prob = env.reset()
 
-            # IMPORTANT: Adjust reward if agent falls into a hole
-            # In FrozenLake, reward is 0 for holes, but we want -1 for learning
-            if done and reward == 0:
-                reward = -1
+        for _ in range(max_steps):
+            # randomAction = env.action_space.sample()
+            policyAction = policy(currentState)
 
-            # Store current state and the (potentially modified) reward
-            # received *after* transitioning from it
-            episode_history.append((state, reward))
-            state = new_state  # Update current state
+            next_state, currentReward, done, _, _ = env.step(policyAction)
 
-            if done or truncated:
+            rewardInVisitedState.append(int(currentReward))
+            visitedStatesInEpisode.append(int(currentState))
+
+            currentState = next_state
+            if done:
                 break
 
-        # Monte Carlo update for each state visited in the episode (first-visit MC)
-        G = 0  # Initialize return
-        # Use a set to track states for which we've already processed the first visit
-        visited_states = set()
+        rewardInVisitedState = np.array(rewardInVisitedState)
+        visitedStatesInEpisode = np.array(visitedStatesInEpisode)
+        numberofVisitedStates = len(visitedStatesInEpisode)
 
-        # Iterate through the episode history in reverse to calculate returns
-        # and update V
-        for t in reversed(range(len(episode_history))):
-            current_state, current_reward = episode_history[t]
-            G = current_reward + gamma * G  # Calculate discounted return
+        Gt = 0.0
 
-            # Update V only if this is the first time we're seeing this state
-            # in this backward pass (i.e., first-visit Monte Carlo)
-            if current_state not in visited_states:
-                V[current_state] = V[current_state] + alpha * (G - V[current_state])
-                visited_states.add(current_state)
+        for episode_iter in reversed(range(len(visitedStatesInEpisode))):
+            # print(f"current epsiode {current_episode}")
+
+            stateTmp = visitedStatesInEpisode[episode_iter]
+            returnTmp = rewardInVisitedState[episode_iter]
+
+            Gt = gamma * Gt + returnTmp
+
+            if stateTmp not in visitedStatesInEpisode[:episode]:
+                V[stateTmp] = V[stateTmp] + (alpha * (Gt - V[stateTmp]))
 
     return V
