@@ -37,7 +37,14 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
         for step in range(max_steps):
             action = policy(state)  # Get action from the policy
             new_state, reward, done, truncated, _ = env.step(action)
-            # Store current state and the reward received *after* transitioning from it
+
+            # IMPORTANT: Adjust reward if agent falls into a hole
+            # In FrozenLake, reward is 0 for holes, but we want -1 for learning
+            if done and reward == 0:
+                reward = -1
+
+            # Store current state and the (potentially modified) reward
+            # received *after* transitioning from it
             episode_history.append((state, reward))
             state = new_state  # Update current state
 
