@@ -30,7 +30,7 @@ def epsilon_greedy(Q, state, epsilon):
 
 
 def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
-                  gamma=0.99, epsilon=1, min_epsilon=0.1, epsilon_decay=0.05):
+                  gamma=0.99, epsilon=1, min_epsilon=0.1, epsilon_decay=0.001): # Changed epsilon_decay here
     """
     Performs the SARSA(λ) algorithm for Q-value estimation.
 
@@ -49,7 +49,7 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
         min_epsilon (float, optional): The minimum value that epsilon should
             decay to. Defaults to 0.1.
         epsilon_decay (float, optional): The decay rate for updating epsilon
-            between episodes. Defaults to 0.05.
+            between episodes. Defaults to 0.001. # Changed default value
 
     Returns:
         numpy.ndarray: Q, the updated Q table.
