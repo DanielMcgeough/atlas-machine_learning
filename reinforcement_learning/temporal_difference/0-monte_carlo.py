@@ -4,7 +4,7 @@ Performs the Monte Carlo algorithm for value estimation.
 """
 
 import numpy as np
-import gymnasium as gym  # gymnasium is imported here for type hinting, not direct use
+# gymnasium is not imported here as per the constraint that only numpy is allowed.
 
 
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
@@ -12,7 +12,7 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
     Performs the Monte Carlo algorithm for value estimation.
 
     Args:
-        env (gym.Env): The environment instance.
+        env (object): The environment instance (expected to be a Gymnasium Env).
         V (numpy.ndarray): A numpy.ndarray of shape (s,) containing the
             value estimate for each state.
         policy (function): A function that takes in a state and returns
