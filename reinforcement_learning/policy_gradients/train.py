@@ -41,69 +41,61 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     Returns:
         list: A list containing the total reward (score) obtained in each episode.
     """
-    # Determine the number of states and actions from the environment
-    # For discrete observation spaces (like FrozenLake), use .n
-    num_states = env.observation_space.n
+    # Determine the number of features from the environment's observation space shape
+    # For continuous observation spaces (like Box), use .shape[0]
+    num_features = env.observation_space.shape[0]
+    # Number of actions (assumed discrete for policy gradient output)
     num_actions = env.action_space.n
 
-    # Initialize the policy's weight matrix (theta renamed to weight for consistency)
-    # Using np.random.rand for random initialization as per common practice.
-    # Scaled by 0.01 to keep initial values small.
-    weight = np.random.rand(num_states, num_actions) * 0.01
+    # Initialize the policy's weight matrix
+    # Weight matrix shape: (num_features, num_actions)
+    weight = np.random.rand(num_features, num_actions) * 0.01
 
-    total_episode_scores = []  # Renamed from total_rewards for clarity as per prompt
+    total_episode_scores = []
 
     # Get max steps for an episode from environment spec, default to 200 if not found
     max_steps_in_episode = getattr(env.spec, 'max_episode_steps', 200)
 
     for episode in range(nb_episodes):
         # Lists to store history for the current episode
-        episode_states = []
+        episode_states = [] # Stores raw state observations
         episode_actions = []
         episode_rewards = []
-        episode_gradients = []  # Store the gradient computed at each step
+        episode_gradients = []
 
-        state, _ = env.reset()  # Reset environment and get initial state
+        state, _ = env.reset()  # Get initial state (numpy array for Box space)
 
-        current_episode_score = 0.0 # Track score for current episode
+        current_episode_score = 0.0
 
         for step in range(max_steps_in_episode):
-            # Convert integer state to one-hot encoded vector
-            # This is crucial because policy_gradient expects a feature vector/matrix
-            state_one_hot = np.zeros(num_states)
-            state_one_hot[state] = 1
+            # Pass the raw state directly to policy_gradient as it's a feature vector
+            action, gradient = policy_gradient(state, weight)
 
-            # Get action and the corresponding gradient from the policy
-            action, gradient = policy_gradient(state_one_hot, weight)
-            next_state, reward, done, truncated, _ = env.step(action)
-
-            # Adjust reward if agent falls into a hole (common for FrozenLake)
-            if done and reward == 0:
-                reward = -1
+            # Take a step in the environment
+            new_state, reward, done, truncated, _ = env.step(action)
 
             # Store the current step's data
-            episode_states.append(state_one_hot)
+            episode_states.append(state) # Store the raw state
             episode_actions.append(action)
             episode_rewards.append(reward)
             episode_gradients.append(gradient)
 
             current_episode_score += reward
-            state = next_state  # Update state for next iteration
+            state = new_state  # Update state for next iteration
 
-            if done or truncated:  # Check for both done and truncated
+            if done or truncated:
                 break
 
         # Calculate discounted returns for the collected episode rewards
         discounted_returns = calculate_rewards_andr(episode_rewards, gamma)
 
         # Update policy weights using the REINFORCE algorithm
-        # For each step in the episode:
         for t in range(len(episode_rewards)):
-            G_t = discounted_returns[t]  # Return from time t onwards
-            gradient_t = episode_gradients[t]  # Gradient computed at time t for the taken action
+            G_t = discounted_returns[t]
+            gradient_t = episode_gradients[t]
             weight += alpha * G_t * gradient_t
 
-        # Print the episode number and score as per the specified format
+        # Print the episode number and score
         print(f"Episode: {episode + 1} Score: {current_episode_score}")
         total_episode_scores.append(current_episode_score)
 
