@@ -5,14 +5,8 @@ Implements a full training loop for a Monte-Carlo policy gradient agent.
 
 import numpy as np
 
-# Import policy and policy_gradient functions from their respective modules.
-# Assuming these are in files named 'policy.py' and 'policy_gradient.py'
-# in the same directory, or accessible via Python path.
-# The prompt explicitly states: policy_gradient = __import__('policy_gradient').policy_gradient
-# This implies that policy_gradient.py will contain both policy and policy_gradient.
-# So we only need to import policy_gradient, and it will bring policy along.
-policy_gradient_module = __import__('policy_gradient')
-policy_gradient_func = policy_gradient_module.policy_gradient
+# Import policy_gradient function from its module as specified.
+policy_gradient = __import__('policy_gradient').policy_gradient
 
 
 def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
@@ -58,7 +52,7 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
             state_one_hot[state] = 1
 
             # Get action and gradient from the policy
-            action, gradient = policy_gradient_func(state_one_hot, weight)
+            action, gradient = policy_gradient(state_one_hot, weight)
 
             # Take a step in the environment
             new_state, reward, done, truncated, _ = env.step(action)
