@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+Module that computes a policy's action
+probabilities given input features and weights.
+it then trains the policy.
+"""
+
+
 def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     """
     Implements a full training loop for a Monte-Carlo policy gradient agent.
