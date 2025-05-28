@@ -1,73 +1,64 @@
 #!/usr/bin/env python3
-"""documentation"""
+"""runs training using monte carlo"""
 import numpy as np
 policy_gradient = __import__('policy_gradient').policy_gradient
 
 
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
-    """documentation"""
-    initial_state = env.reset()
-    if isinstance(initial_state, tuple):
-        state = initial_state[0]
-    else:
-        state = initial_state
+def calculate_rewards_andr(rewards, gamma):
+    """calculates discounted rewards"""
+    DiscountedReturns = []
+    for t in range(len(rewards)):
+        G = 0.0
+        for k, r in enumerate(rewards[t:]):
+            G += (gamma ** k) * r
+        DiscountedReturns.append(G)
+    return DiscountedReturns
 
-    n_states = len(state)
-    n_actions = env.action_space.n
 
-    weights = np.random.normal(size=(n_states, n_actions))
-
-    all_scores = []
+def train(
+        env,
+        nb_episodes,
+        alpha=0.000045,
+        gamma=0.98,
+        max_steps=500,
+        show_result=False):
+    """trains a policy using monte carlo method"""
+    state_dim = env.observation_space.shape[0]
+    action_dim = env.action_space.n
+    theta = np.random.randn(state_dim, action_dim) * 0.01
+    total_rewards = []
+    episode_reward = 0.0
 
     for episode in range(nb_episodes):
-        initial_state = env.reset()
-        if isinstance(initial_state, tuple):
-            state = initial_state[0]
-        else:
-            state = initial_state
+        states, actions, rewards, = [], [], []
+        episode_rewards, gradients = [], []
+        state, _ = env.reset()
+        for step in range(max_steps):
+            if show_result and (episode % 1000 == 0) and episode > 0:
+                env.render()
+            action, gradient = policy_gradient(state, theta)
+            next_state, reward, done, _, _ = env.step(action)
 
-        episode_rewards = []
-        episode_gradients = []
+            states.append(state)
+            actions.append(action)
+            rewards.append(reward)
+            gradients.append(gradient)
 
-        done = False
-        while not done:
-
-            action, gradient = policy_gradient(state, weights)
-
-            step_result = env.step(action)
-
-            if len(step_result) == 4:
-                next_state, reward, done, _ = step_result
-            else:
-                next_state, reward, terminated, truncated, _ = step_result
-                done = terminated or truncated
-
-            if isinstance(next_state, tuple):
-                next_state = next_state[0]
-
-            episode_rewards.append(reward)
-            episode_gradients.append(gradient)
-
+            # episode_reward += reward * (gamma ** step)
             state = next_state
+            if done:
+                break
 
-        discounted_rewards = []
-        cumulative_reward = 0
-        for reward in reversed(episode_rewards):
-            cumulative_reward = reward + gamma * cumulative_reward
-            discounted_rewards.insert(0, cumulative_reward)
+        discounted_rewards = calculate_rewards_andr(rewards, gamma)
+        # episode_rewards.append(episode_reward)
 
-        discounted_rewards = np.array(discounted_rewards)
-        discounted_rewards = (discounted_rewards - np.mean
-                              (discounted_rewards)) / \
-            (np.std(discounted_rewards) + 1e-10)
+        # for t, (loss_state, loss_action, G_t) in enumerate(zip(states,
+        # actions, discounted_rewards)):
+        for t in range(len(rewards)):
+            G_t = discounted_rewards[t]
+            theta += alpha * G_t * gradients[t]
 
-        for gradient, discounted_reward in zip(episode_gradients,
-                                               discounted_rewards):
-            weights += alpha * gradient * discounted_reward
+        print(f"Episode: {episode} Score: {sum(rewards)}")
+        total_rewards.append(sum(rewards))
 
-        episode_score = sum(episode_rewards)
-        all_scores.append(episode_score)
-
-        print("Episode: {} Score: {}".format(episode, episode_score))
-
-    return all_scores
+    return total_rewards
