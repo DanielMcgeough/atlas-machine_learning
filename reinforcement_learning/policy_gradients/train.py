@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 """
-Module that computes a policy's action
-probabilities given input features and weights.
-it then trains the policy.
+Implements a full training loop for a Monte-Carlo policy gradient agent.
 """
+
+import numpy as np
+
+# Import policy and policy_gradient functions from their respective modules.
+# Assuming these are in files named 'policy.py' and 'policy_gradient.py'
+# in the same directory, or accessible via Python path.
+# The prompt explicitly states: policy_gradient = __import__('policy_gradient').policy_gradient
+# This implies that policy_gradient.py will contain both policy and policy_gradient.
+# So we only need to import policy_gradient, and it will bring policy along.
+policy_gradient_module = __import__('policy_gradient')
+policy_gradient_func = policy_gradient_module.policy_gradient
 
 
 def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
@@ -20,11 +29,6 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         list: A list containing the score (sum of all rewards during one
               episode loop) for each episode.
     """
-    # Import policy_gradient (already defined in this module)
-    # This line is kept as per the prompt's explicit instruction,
-    # though it's redundant when functions are in the same file.
-    policy_gradient_func = policy_gradient
-
     # Initialize weights randomly
     # Number of states (features) for one-hot encoding
     num_states = env.observation_space.n
@@ -42,7 +46,13 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         episode_history = []  # Stores (state_one_hot, action, reward, gradient)
         current_episode_score = 0
 
-        for step in range(env.spec.max_episode_steps): # Use env's max_episode_steps if available, otherwise a default like 100
+        # Loop for steps within an episode
+        # Use env.spec.max_episode_steps to get the maximum steps for the environment
+        # If not available, a reasonable default like 100 or 500 can be used.
+        # For FrozenLake, max_episode_steps is usually 200 for 8x8.
+        max_steps_in_episode = getattr(env.spec, 'max_episode_steps', 200)
+
+        for step in range(max_steps_in_episode):
             # Convert integer state to one-hot encoding
             state_one_hot = np.zeros(num_states)
             state_one_hot[state] = 1
@@ -65,19 +75,22 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         # Calculate returns (G_t) for each step in the episode
         returns = []
         G = 0
+        # Iterate through the episode history in reverse to calculate discounted returns
         for t in reversed(range(len(episode_history))):
             # episode_history[t] is (state_one_hot, action, reward, gradient)
+            # We only need the reward for return calculation
             _, _, reward_t, _ = episode_history[t]
             G = reward_t + gamma * G
-            returns.insert(0, G) # Insert at the beginning to maintain original order
+            returns.insert(0, G) # Insert at the beginning to maintain original order of returns
 
-        # Apply the weight update for each step
+        # Apply the weight update for each step using the calculated returns
         for t in range(len(episode_history)):
-            _, _, _, gradient_t = episode_history[t] # Get the gradient calculated at this step
-            G_t = returns[t]
+            # Get the gradient calculated at this specific step
+            _, _, _, gradient_t = episode_history[t]
+            G_t = returns[t] # Get the corresponding return for this step
             weight += alpha * gradient_t * G_t
 
-        # Print current episode number and score
+        # Print current episode number and score in the specified format
         print(f"Episode: {episode + 1} Score: {current_episode_score}")
         scores.append(current_episode_score)
 
