@@ -85,3 +85,59 @@ def policy(matrix, weight):
     probabilities = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
 
     return probabilities
+
+def policy_gradient(state, weight):
+    """
+    Computes the Monte-Carlo policy gradient for a given state and weight matrix.
+
+    This function calculates the gradient of the log-policy with respect to
+    the policy's weights for a sampled action. This gradient is a key component
+    of policy gradient methods (e.g., REINFORCE algorithm), where it's scaled
+    by the observed return (G_t) and then used to update the policy weights.
+
+    Args:
+        state (numpy.ndarray): A numpy.ndarray representing the current
+            observation (features) of the environment. Expected shape is
+            `(n_features,)` for a single state, or `(1, n_features)` if
+            passed as a single-sample batch.
+        weight (numpy.ndarray): A numpy.ndarray representing the policy's
+            weight matrix. Expected shape is `(n_features, n_actions)`.
+
+    Returns:
+        tuple: A tuple containing:
+            - int: The action sampled from the policy's probability distribution.
+            - numpy.ndarray: The gradient of the log-policy with respect to
+              the weight matrix for the sampled action. Its shape is
+              `(n_features, n_actions)`.
+    """
+    # 1. Get action probabilities from the policy
+    # The 'policy' function can handle both (n_features,) and (1, n_features) inputs.
+    # We flatten the result to ensure it's a 1D array of probabilities for np.random.choice.
+    probabilities = policy(state, weight).flatten()
+
+    # 2. Sample an action from the probability distribution
+    num_actions = probabilities.shape[0]
+    action = np.random.choice(num_actions, p=probabilities)
+
+    # 3. Compute the gradient of the log-policy with respect to the weights
+    # Create a one-hot vector for the sampled action.
+    one_hot_action = np.zeros(num_actions)
+    one_hot_action[action] = 1
+
+    # The core policy gradient identity is:
+    # ∇_θ log(π_θ(a|s)) = ∇_θ Z_a - Σ_j π_θ(j|s) ∇_θ Z_j
+    # For a linear policy Z_k = state @ weight_k, ∇_W Z_k is (state_T @ e_k_T).
+    # This simplifies to: ∇_W log(π_θ(a|s)) = state_T @ (e_a - π_θ(s))
+    
+    # Ensure state is 1D for np.outer.
+    # If state was (1, n_features), flatten it to (n_features,).
+    if state.ndim > 1:
+        state_flat = state.flatten()
+    else:
+        state_flat = state
+
+    # Calculate the gradient matrix using the outer product.
+    # The outer product of (n_features,) and (n_actions,) results in (n_features, n_actions).
+    gradient = np.outer(state_flat, (one_hot_action - probabilities))
+
+    return action, gradient
