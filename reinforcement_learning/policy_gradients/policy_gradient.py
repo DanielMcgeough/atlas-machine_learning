@@ -1,103 +1,91 @@
 #!/usr/bin/env python3
-"""computes simple policy"""
+"""
+Module that computes the Monte-Carlo policy gradient for a given state and weights.
+"""
+
 import numpy as np
 
 
-def softmax(x):
-    """performs softmax function as numpy doesn't have a built in one"""
-    logits = np.exp(x - np.max(x))
-    return logits / np.sum(logits, axis=1, keepdims=True)
-
-
 def policy(matrix, weight):
-    """computes policy with a weight of a matrix. You just matmul and then
-    apply softmax"""
-    base = np.matmul(matrix, weight)
+    """
+    Computes the policy's action probabilities using a linear transformation
+    followed by a softmax activation.
 
-    if base.ndim == 1:
-        base = base[np.newaxis, :]
+    Args:
+        matrix (numpy.ndarray): The input to the policy. This can represent
+            features of a single state (shape: `(n_features,)`) or features
+            for a batch of states (shape: `(batch_size, n_features)`).
+        weight (numpy.ndarray): The policy's weight matrix. Its shape should be
+            `(n_features, n_actions)`, where `n_features` matches the number
+            of features in `matrix`, and `n_actions` is the number of
+            possible actions.
 
-    policy_softmax = softmax(base)
-
-    return policy_softmax
-
-
-def policy_action(policy_softmax):
-    """function that gets the policy of the given policy output"""
-    action_probabilites = policy_softmax.squeeze(
-        0)  # since output of policy is 2d and we need 1d
-
-    num_possible_actions = len(action_probabilites)
-    # choose an action
-    action = np.random.choice(
-        np.arange(num_possible_actions), p=action_probabilites
-    )
-    return action, action_probabilites
+    Returns:
+        numpy.ndarray: A numpy.ndarray representing the probability distribution
+            over actions.
+            - If `matrix` is `(n_features,)`, the output shape will be
+              `(n_actions,)`.
+            - If `matrix` is `(batch_size, n_features)`, the output shape will be
+              `(batch_size, n_actions)`, with each row being a probability
+              distribution for the corresponding state in the batch.
+    """
+    logits = np.dot(matrix, weight)
+    # Subtracting the maximum value from logits for numerical stability before exp
+    exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True))
+    probabilities = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
+    return probabilities
 
 
 def policy_gradient(state, weight):
-    """computes Monte Carlo policy gradient, returns the action
-    and the log of the gradient"""
-    policy_softmax = policy(
-        state,
-        weight)
-    # applying softmax to make sure it's a valid probability
-    # distribution (positive and sums to 1)
+    """
+    Computes the Monte-Carlo policy gradient for a given state and weight matrix.
 
-    action, action_probs = policy_action(policy_softmax)
+    This function calculates the gradient of the log-policy with respect to
+    the policy's weights for a sampled action. This gradient is a key component
+    of policy gradient methods (e.g., REINFORCE algorithm), where it's scaled
+    by the observed return (G_t) and then used to update the policy weights.
 
-    dlogpi = np.outer(state, np.eye(len(action_probs))[action] - action_probs)
+    Args:
+        state (numpy.ndarray): A numpy.ndarray representing the current
+            observation (features) of the environment. Expected shape is
+            `(n_features,)` for a single state, or `(1, n_features)` if
+            passed as a single-sample batch.
+        weight (numpy.ndarray): A numpy.ndarray representing the policy's
+            weight matrix. Expected shape is `(n_features, n_actions)`.
 
-    return action, dlogpi
+    Returns:
+        tuple: A tuple containing:
+            - int: The action sampled from the policy's probability distribution.
+            - numpy.ndarray: The gradient of the log-policy with respect to
+              the weight matrix for the sampled action. Its shape is
+              `(n_features, n_actions)`.
+    """
+    # 1. Get action probabilities from the policy
+    # The 'policy' function can handle both (n_features,) and (1, n_features) inputs.
+    # We flatten the result to ensure it's a 1D array of probabilities for np.random.choice.
+    probabilities = policy(state, weight).flatten()
 
+    # 2. Sample an action from the probability distribution
+    num_actions = probabilities.shape[0]
+    action = np.random.choice(num_actions, p=probabilities)
 
-def calculate_rewards_andr(rewards, gamma):
-    """calculates discounted rewards"""
-    DiscountedReturns = []
-    for t in range(len(rewards)):
-        G = 0.0
-        for k, r in enumerate(rewards[t:]):
-            G += (gamma ** k) * r
-        DiscountedReturns.append(G)
-    return DiscountedReturns
+    # 3. Compute the gradient of the log-policy with respect to the weights
+    # Create a one-hot vector for the sampled action.
+    one_hot_action = np.zeros(num_actions)
+    one_hot_action[action] = 1
 
+    # The core policy gradient identity for a linear policy is:
+    # ∇_W log(π_θ(a|s)) = state_T @ (e_a - π_θ(s))
+    
+    # Ensure state is 1D for np.outer.
+    # If state was (1, n_features), flatten it to (n_features,).
+    if state.ndim > 1:
+        state_flat = state.flatten()
+    else:
+        state_flat = state
 
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98, max_steps=500):
-    """trains a policy using monte carlo method"""
-    state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
-    theta = np.random.randn(state_dim, action_dim) * 0.01
-    total_rewards = []
-    episode_reward = 0.0
+    # Calculate the gradient matrix using the outer product.
+    # The outer product of (n_features,) and (n_actions,) results in (n_features, n_actions).
+    gradient = np.outer(state_flat, (one_hot_action - probabilities))
 
-    for episode in range(nb_episodes):
-        states, actions, rewards,  = [], [], []
-        episode_rewards, gradients = [], []
-        state, _ = env.reset()
-        for step in range(max_steps):
-            action, gradient = policy_gradient(state, theta)
-            next_state, reward, done, _, _ = env.step(action)
-
-            states.append(state)
-            actions.append(action)
-            rewards.append(reward)
-            gradients.append(gradient)
-
-            # episode_reward += reward * (gamma ** step)
-            state = next_state
-            if done:
-                break
-
-        discounted_rewards = calculate_rewards_andr(rewards, gamma)
-        # episode_rewards.append(episode_reward)
-
-        # for t, (loss_state, loss_action, G_t) in enumerate(zip(states,
-        # actions, discounted_rewards)):
-        for t in range(len(rewards)):
-            G_t = discounted_rewards[t]
-            theta += alpha * G_t * gradients[t]
-
-        print(f"Episode: {episode} Score: {sum(rewards)}")
-        total_rewards.append(sum(rewards))
-
-    return total_rewards
+    return action, gradient
