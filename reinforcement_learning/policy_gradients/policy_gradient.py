@@ -1,91 +1,52 @@
 #!/usr/bin/env python3
-"""
-Module that computes the Monte-Carlo policy gradient for a given state and weights.
-"""
-
+"""module for policy gradient"""
 import numpy as np
 
 
 def policy(matrix, weight):
-    """
-    Computes the policy's action probabilities using a linear transformation
-    followed by a softmax activation.
+    """Function that computes the policy
+    with a weight of a matrix
+    matrix is the state matrix of shape
+    (batch_size, state_dim)
+    weight is the weight matrix of shape
+    (state_dim, action_dim)"""
 
-    Args:
-        matrix (numpy.ndarray): The input to the policy. This can represent
-            features of a single state (shape: `(n_features,)`) or features
-            for a batch of states (shape: `(batch_size, n_features)`).
-        weight (numpy.ndarray): The policy's weight matrix. Its shape should be
-            `(n_features, n_actions)`, where `n_features` matches the number
-            of features in `matrix`, and `n_actions` is the number of
-            possible actions.
+    # See if matrix is 2D
+    if matrix.ndim == 1:
+        matrix = matrix.reshape(1, -1)
 
-    Returns:
-        numpy.ndarray: A numpy.ndarray representing the probability distribution
-            over actions.
-            - If `matrix` is `(n_features,)`, the output shape will be
-              `(n_actions,)`.
-            - If `matrix` is `(batch_size, n_features)`, the output shape will be
-              `(batch_size, n_actions)`, with each row being a probability
-              distribution for the corresponding state in the batch.
-    """
+    # Find logits by matrix multiplication
     logits = np.dot(matrix, weight)
-    # Subtracting the maximum value from logits for numerical stability before exp
-    exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True))
-    probabilities = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
-    return probabilities
+
+    # Apply softmax
+    sm_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
+
+    # Normalize to get probabilities
+    policy_probs = sm_logits / np.sum(sm_logits, axis=1, keepdims=True)
+
+    return policy_probs
 
 
 def policy_gradient(state, weight):
-    """
-    Computes the Monte-Carlo policy gradient for a given state and weight matrix.
+    """Function that computes the Monte-Carlo policy gradient based on a state
+    and a weight matrix
+        state is a matrix representing the current observation of the
+        environment
+        weight is a matrix of random weight
 
-    This function calculates the gradient of the log-policy with respect to
-    the policy's weights for a sampled action. This gradient is a key component
-    of policy gradient methods (e.g., REINFORCE algorithm), where it's scaled
-    by the observed return (G_t) and then used to update the policy weights.
+        Return: the action and the gradient (in this order)"""
 
-    Args:
-        state (numpy.ndarray): A numpy.ndarray representing the current
-            observation (features) of the environment. Expected shape is
-            `(n_features,)` for a single state, or `(1, n_features)` if
-            passed as a single-sample batch.
-        weight (numpy.ndarray): A numpy.ndarray representing the policy's
-            weight matrix. Expected shape is `(n_features, n_actions)`.
+    # Get policy probabilities
+    probs = policy(state, weight)
 
-    Returns:
-        tuple: A tuple containing:
-            - int: The action sampled from the policy's probability distribution.
-            - numpy.ndarray: The gradient of the log-policy with respect to
-              the weight matrix for the sampled action. Its shape is
-              `(n_features, n_actions)`.
-    """
-    # 1. Get action probabilities from the policy
-    # The 'policy' function can handle both (n_features,) and (1, n_features) inputs.
-    # We flatten the result to ensure it's a 1D array of probabilities for np.random.choice.
-    probabilities = policy(state, weight).flatten()
+    # Sample action from the prob distribution
+    action = np.random.choice(probs.shape[1], p=probs.flatten())
 
-    # 2. Sample an action from the probability distribution
-    num_actions = probabilities.shape[0]
-    action = np.random.choice(num_actions, p=probabilities)
+    # Create one-hot vector for selected action
+    action_onehot = np.zeros(probs.shape[1])
+    action_onehot[action] = 1
 
-    # 3. Compute the gradient of the log-policy with respect to the weights
-    # Create a one-hot vector for the sampled action.
-    one_hot_action = np.zeros(num_actions)
-    one_hot_action[action] = 1
-
-    # The core policy gradient identity for a linear policy is:
-    # ∇_W log(π_θ(a|s)) = state_T @ (e_a - π_θ(s))
-    
-    # Ensure state is 1D for np.outer.
-    # If state was (1, n_features), flatten it to (n_features,).
-    if state.ndim > 1:
-        state_flat = state.flatten()
-    else:
-        state_flat = state
-
-    # Calculate the gradient matrix using the outer product.
-    # The outer product of (n_features,) and (n_actions,) results in (n_features, n_actions).
-    gradient = np.outer(state_flat, (one_hot_action - probabilities))
+    # Compute gradient: state^T * (action_onehot - probs)
+    gradient = np.outer(state.flatten(), action_onehot - probs.flatten())
 
     return action, gradient
