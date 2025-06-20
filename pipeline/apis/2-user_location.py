@@ -1,38 +1,26 @@
 #!/usr/bin/env python3
-
-"""This uses the github api
-and is causing me psychosis."""
-
-import sys
+"""Task 2. Rate me is you can!"""
 import requests
+import sys
 from datetime import datetime
 
 
 def get_user_location(url):
-    """finds a user"""
+    """script that prints the location of a specific user"""
     response = requests.get(url)
 
-    if response.status_code == 200:
-        user_data = response.json()
-        return user_data.get("location", "Location not provided")
-    elif response.status_code == 404:
-        return "Not found"
+    if response.status_code == 404:
+        print("Not found")
     elif response.status_code == 403:
-        reset_timestamp = int(response.headers.get("X-Ratelimit-Reset", 0))
-
-        reset_time = datetime.fromtimestamp(reset_timestamp)
-        current_time = datetime.now()
-        minutes_until_reset = (reset_time - current_time).seconds // 60
-        return f"Reset in {minutes_until_reset} min"
+        reset_timestamp = response.headers.get('X-Ratelimit-Reset')
+        reset_time = datetime.fromtimestamp(int(reset_timestamp))
+        wait_time = reset_time - datetime.now()
+        minutes = divmod(wait_time.total_seconds(), 60)[0]
+        print("Reset in {} min".format(int(minutes)))
     else:
-        return f"Unexpected status code: {response.status_code}"
+        user_data = response.json()
+        print(user_data.get('location', "No location found"))
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: ./2-user_location.py <https://api.github.com/users/holbertonschool>")
-        sys.exit(1)
-
-    url = sys.argv[1]
-    location = get_user_location(url)
-    print(location)
+if __name__ == '__main__':
+    get_user_location(sys.argv[1])
