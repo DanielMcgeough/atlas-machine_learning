@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Task 0"""
+"""I mean star wars is pretty cool I guess"""
 import requests
 
 
 def availableShips(passengerCount):
     """
     Using the Swapi API, returns the list of ships that can hold a given
-    number of passengers
+    number of passengers like the Death Star.
     """
     page = 1
     api = "https://swapi-api.alx-tools.com/api/"
