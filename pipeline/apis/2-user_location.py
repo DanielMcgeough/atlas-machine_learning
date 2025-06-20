@@ -30,7 +30,7 @@ def get_user_location(url):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: ./2-user_location.py <GitHub API URL>")
+        print("Usage: ./2-user_location.py <https://api.github.com/users/holbertonschool>")
         sys.exit(1)
 
     url = sys.argv[1]
