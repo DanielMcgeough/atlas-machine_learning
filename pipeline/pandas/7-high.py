@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 """Sorts by highest price in descending order"""
