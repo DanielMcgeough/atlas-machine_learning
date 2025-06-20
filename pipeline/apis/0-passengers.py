@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
-
-"""We're starting work with APIs
-I never remember what API stands for"""
-
+"""Task 0"""
 import requests
 
 
 def availableShips(passengerCount):
-    """Also I just want to say how much I hate that we're working with
-    the Starwars API. Pokemon or OMDB would be better."""
+    """
+    Using the Swapi API, returns the list of ships that can hold a given
+    number of passengers
+    """
+    page = 1
+    api = "https://swapi-api.alx-tools.com/api/"
+    category = "starships/"
+    ships = []
 
-    url = "https://swapi.dev/api/starships/"
-    ret_list = []
+    while True:
+        r = requests.get(api + category + "?page={}".format(page)).json()
 
-    while url:
-        response = requests.get(url)
-        data = response.json()
-
-        for ship in data["results"]:
+        for ship in r['results']:
+            passengers = ship['passengers']
             try:
-                passengers = int(ship["passengers"].replace(",", ""))
-                ship_name = ship["name"]
+                if int(passengers.replace(',', '')) >= passengerCount:
+                    ships.append(ship['name'])
             except ValueError:
-                # ship_name = ship["name"]
-                passengers = ship["passengers"].replace(",", "")
-                passengers = 0
+                pass
 
-            if passengers >= passengerCount:
-                ret_list.append(ship["name"])
+        if not r['next']:
+            break
 
-        url = data["next"]
+        page += 1
 
-    return ret_list
+    return ships
