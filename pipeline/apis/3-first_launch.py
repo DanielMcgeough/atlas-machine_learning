@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""""""
+"""trying to work this is nearly impossible."""
 
 if __name__ == '__main__':
     from requests import get
