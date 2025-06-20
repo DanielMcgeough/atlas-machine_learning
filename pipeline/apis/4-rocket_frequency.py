@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""""""
+"""Final, i hate spacex"""
 
 if __name__ == '__main__':
     from requests import get
